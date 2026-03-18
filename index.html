@@ -129,11 +129,31 @@ body {
 .primary-btn:hover { transform:scale(1.05) translateY(-2px); }
 ::-webkit-scrollbar { width:5px; }
 ::-webkit-scrollbar-thumb { background:#86efac; border-radius:10px; }
+.mic-btn {
+  width:46px; height:46px; border-radius:13px; border:2px solid #fbcfe8;
+  font-size:20px; cursor:pointer; transition:all .2s; flex-shrink:0;
+  background:#fce7f3; display:flex; align-items:center; justify-content:center;
+}
+.mic-btn.listening {
+  background:#f472b6; border-color:#f472b6;
+  box-shadow: 0 0 0 5px rgba(244,114,182,0.25);
+}
+.sound-banner {
+  position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
+  background:linear-gradient(135deg,#34d399,#059669); color:white;
+  border:none; border-radius:20px; padding:12px 28px;
+  font-size:16px; font-weight:800; font-family:"Nunito",sans-serif;
+  cursor:pointer; box-shadow:0 6px 20px rgba(5,150,105,0.4);
+  z-index:999; animation:floatUp .4s ease both;
+}
 </style>
 </head>
 <body>
 
 <!-- WELCOME -->
+<!-- Sound unlock banner -->
+<button class="sound-banner" id="sound-banner" onclick="unlockAudio()">🔊 Tap to enable sound!</button>
+
 <div id="screen-welcome" class="screen active">
   <div class="welcome-card">
     <div class="lily-wrap" style="margin:0 auto;">
@@ -180,7 +200,8 @@ body {
       <div class="msg-col" id="msg-col"></div>
     </div>
     <div class="chat-inputbar">
-      <input id="chat-input" type="text" placeholder="Write in English… ✍️" onkeydown="handleKey(event)"/>
+      <button class="mic-btn" id="mic-btn" onclick="toggleMic()" title="Speak">🎤</button>
+      <input id="chat-input" type="text" placeholder="Write or speak… ✍️🎤" onkeydown="handleKey(event)"/>
       <button class="send-btn" id="send-btn" onclick="sendMsg()" disabled>➤</button>
     </div>
   </div>
@@ -342,6 +363,108 @@ function handleKey(e) {
 document.getElementById('chat-input').addEventListener('input', e => {
   document.getElementById('send-btn').disabled = !e.target.value.trim() || loading;
 });
+
+// ── AUDIO UNLOCK ──
+let audioUnlocked = false;
+function unlockAudio() {
+  audioUnlocked = true;
+  document.getElementById('sound-banner').style.display = 'none';
+  // warm up speech synthesis
+  const u = new SpeechSynthesisUtterance('');
+  window.speechSynthesis.speak(u);
+}
+
+// ── SPEECH SYNTHESIS — Lily speaks ──
+function speak(text) {
+  if (!audioUnlocked || !window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const clean = text.replace(/[^ -]/g, ' ').replace(/\s+/g,' ').trim();
+  const utt = new SpeechSynthesisUtterance(clean);
+  utt.lang  = 'en-GB';
+  utt.rate  = 0.88;
+  utt.pitch = 1.15;
+  // pick a female voice if available
+  const voices = window.speechSynthesis.getVoices();
+  const voice = voices.find(v => v.lang === 'en-GB' && /female|zira|hazel|susan|karen|moira/i.test(v.name))
+             || voices.find(v => v.lang === 'en-GB')
+             || voices.find(v => v.lang.startsWith('en'));
+  if (voice) utt.voice = voice;
+  utt.onstart = () => { if (anim_chat) anim_chat.setSpeed(1.4); };
+  utt.onend   = () => { if (anim_chat) anim_chat.setSpeed(1); };
+  window.speechSynthesis.speak(utt);
+}
+
+// load voices async (Chrome needs this)
+window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+
+// ── SPEECH RECOGNITION — Zoe speaks ──
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognition = null;
+let isListening = false;
+
+if (SpeechRecognition) {
+  recognition = new SpeechRecognition();
+  recognition.lang = 'en-US';
+  recognition.continuous = false;
+  recognition.interimResults = false;
+
+  recognition.onresult = e => {
+    const transcript = e.results[0][0].transcript;
+    document.getElementById('chat-input').value = transcript;
+    document.getElementById('send-btn').disabled = false;
+    stopListening();
+    // auto-send after 600ms
+    setTimeout(sendMsg, 600);
+  };
+  recognition.onerror = () => stopListening();
+  recognition.onend   = () => stopListening();
+}
+
+function toggleMic() {
+  if (!recognition) {
+    alert('Voice not supported in this browser. Try Chrome!');
+    return;
+  }
+  if (isListening) stopListening();
+  else startListening();
+}
+
+function startListening() {
+  isListening = true;
+  document.getElementById('mic-btn').classList.add('listening');
+  document.getElementById('mic-btn').textContent = '⏹';
+  document.getElementById('chat-input').placeholder = 'Listening… 👂';
+  recognition.start();
+}
+
+function stopListening() {
+  isListening = false;
+  document.getElementById('mic-btn').classList.remove('listening');
+  document.getElementById('mic-btn').textContent = '🎤';
+  document.getElementById('chat-input').placeholder = 'Write or speak… ✍️🎤';
+  try { recognition.stop(); } catch(e) {}
+}
+
+// patch addBubble to speak Lily messages
+const _origFetchLily = fetchLily;
+// intercept Lily replies to trigger speech
+const _origAddBubble = addBubble;
+window.addBubble = function(who, text) {
+  _origAddBubble(who, text);
+  if (who === 'lily') speak(text);
+};
+// override global
+window.addBubble = function(who, text) {
+  const col = document.getElementById("msg-col");
+  const wrap = document.createElement("div");
+  wrap.style.cssText = "display:flex;justify-content:" + (who==="user"?"flex-end":"flex-start");
+  const b = document.createElement("div");
+  b.className = who === "user" ? "bubble-user" : "bubble-lily";
+  b.textContent = text;
+  wrap.appendChild(b); col.appendChild(wrap);
+  col.scrollTop = col.scrollHeight;
+  if (who === "lily") speak(text);
+};
 </script>
 </body>
 </html>
