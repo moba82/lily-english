@@ -129,6 +129,49 @@ body {
 .primary-btn:hover { transform:scale(1.05) translateY(-2px); }
 ::-webkit-scrollbar { width:5px; }
 ::-webkit-scrollbar-thumb { background:#86efac; border-radius:10px; }
+
+/* ── CALENDAR ── */
+.calendar-wrap {
+  width:100%; max-width:380px; margin:20px auto 0;
+  background:rgba(255,255,255,0.7); border-radius:20px;
+  padding:16px 20px; border:1.5px solid #bbf7d0;
+  box-shadow:0 4px 16px rgba(20,160,100,0.08);
+}
+.calendar-header {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:12px;
+}
+.calendar-header h3 { font-family:"Baloo 2",cursive; font-size:16px; color:#059669; }
+.cal-nav { background:none; border:none; cursor:pointer; font-size:18px; color:#059669; padding:2px 6px; }
+.cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; }
+.cal-dayname { font-size:10px; font-weight:800; color:#6ee7b7; text-align:center; padding:2px 0; }
+.cal-day {
+  aspect-ratio:1; border-radius:50%; display:flex; align-items:center;
+  justify-content:center; font-size:11px; font-weight:700; color:#6b7280;
+  cursor:default;
+}
+.cal-day.practiced {
+  background:linear-gradient(135deg,#34d399,#059669);
+  color:white; box-shadow:0 2px 6px rgba(5,150,105,0.3);
+}
+.cal-day.today { border:2px solid #f472b6; color:#e8619a; }
+.cal-day.today.practiced { border:2px solid white; }
+.cal-day.empty { opacity:0; }
+.cal-streak { text-align:center; margin-top:10px; font-size:12px; font-weight:800; color:#059669; }
+
+/* ── TRANSLATE BUTTON ── */
+.translate-btn {
+  background:none; border:none; cursor:pointer; font-size:16px;
+  padding:2px 4px; opacity:0.7; transition:opacity .15s;
+  vertical-align:middle; margin-left:4px;
+}
+.translate-btn:hover { opacity:1; }
+.translation-bubble {
+  background:#fef9c3; border:1.5px solid #fde047;
+  border-radius:10px; padding:6px 12px; font-size:13px;
+  font-weight:700; color:#854d0e; margin-top:4px;
+  display:inline-block; max-width:100%;
+}
 .mic-btn {
   width:46px; height:46px; border-radius:13px; border:2px solid #fbcfe8;
   font-size:20px; cursor:pointer; transition:all .2s; flex-shrink:0;
@@ -457,14 +500,128 @@ window.addBubble = function(who, text) {
 window.addBubble = function(who, text) {
   const col = document.getElementById("msg-col");
   const wrap = document.createElement("div");
-  wrap.style.cssText = "display:flex;justify-content:" + (who==="user"?"flex-end":"flex-start");
+  wrap.style.cssText = "display:flex;flex-direction:column;align-items:" + (who==="user"?"flex-end":"flex-start");
+  const row = document.createElement("div");
+  row.style.cssText = "display:flex;align-items:flex-end;gap:4px;justify-content:" + (who==="user"?"flex-end":"flex-start");
   const b = document.createElement("div");
   b.className = who === "user" ? "bubble-user" : "bubble-lily";
   b.textContent = text;
-  wrap.appendChild(b); col.appendChild(wrap);
+  row.appendChild(b);
+  if (who === "lily") {
+    const btn = document.createElement("button");
+    btn.className = "translate-btn";
+    btn.textContent = "🇮🇹";
+    btn.title = "Traduci in italiano";
+    btn.onclick = () => translateMsg(text, wrap);
+    row.appendChild(btn);
+  }
+  wrap.appendChild(row);
+  col.appendChild(wrap);
   col.scrollTop = col.scrollHeight;
   if (who === "lily") speak(text);
+  // save practice day
+  savePracticeDay();
 };
+
+// ── CALENDAR ──
+let calYear, calMonth;
+const PRACTICED_KEY = "lily_practiced_days";
+
+function getPracticedDays() {
+  try { return JSON.parse(localStorage.getItem(PRACTICED_KEY) || "[]"); }
+  catch(e) { return []; }
+}
+
+function savePracticeDay() {
+  const days = getPracticedDays();
+  const today = new Date().toISOString().slice(0,10);
+  if (!days.includes(today)) {
+    days.push(today);
+    localStorage.setItem(PRACTICED_KEY, JSON.stringify(days));
+    renderCalendar();
+  }
+}
+
+function renderCalendar() {
+  const now = new Date();
+  if (calYear === undefined) { calYear = now.getFullYear(); calMonth = now.getMonth(); }
+  const days = getPracticedDays();
+  const todayStr = now.toISOString().slice(0,10);
+  const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  document.getElementById("cal-title").textContent = months[calMonth] + " " + calYear;
+  const grid = document.getElementById("cal-grid");
+  grid.innerHTML = "";
+  // day names
+  ["Mo","Tu","We","Th","Fr","Sa","Su"].forEach(d => {
+    const el = document.createElement("div");
+    el.className = "cal-dayname"; el.textContent = d;
+    grid.appendChild(el);
+  });
+  const firstDay = new Date(calYear, calMonth, 1).getDay();
+  const offset = (firstDay + 6) % 7; // Monday first
+  const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
+  for (let i = 0; i < offset; i++) {
+    const el = document.createElement("div"); el.className = "cal-day empty"; grid.appendChild(el);
+  }
+  for (let d = 1; d <= daysInMonth; d++) {
+    const el = document.createElement("div");
+    el.className = "cal-day";
+    el.textContent = d;
+    const dateStr = calYear + "-" + String(calMonth+1).padStart(2,"0") + "-" + String(d).padStart(2,"0");
+    if (days.includes(dateStr)) el.classList.add("practiced");
+    if (dateStr === todayStr) el.classList.add("today");
+    grid.appendChild(el);
+  }
+  // streak
+  let streak = 0;
+  const check = new Date();
+  while(true) {
+    const s = check.toISOString().slice(0,10);
+    if (days.includes(s)) { streak++; check.setDate(check.getDate()-1); }
+    else break;
+  }
+  const streakEl = document.getElementById("cal-streak");
+  if (streak > 0) streakEl.textContent = "🔥 " + streak + " day streak! Keep it up!";
+  else streakEl.textContent = "Start your streak today! 💪";
+}
+
+function calPrev() { calMonth--; if(calMonth<0){calMonth=11;calYear--;} renderCalendar(); }
+function calNext() { calMonth++; if(calMonth>11){calMonth=0;calYear++;} renderCalendar(); }
+
+// init calendar on load
+window.addEventListener("load", () => { setTimeout(renderCalendar, 500); });
+
+// ── TRANSLATION ──
+async function translateMsg(text, container) {
+  // remove existing translation
+  const existing = container.querySelector(".translation-bubble");
+  if (existing) { existing.remove(); return; }
+  const btn = container.querySelector(".translate-btn");
+  if (btn) btn.textContent = "⏳";
+  try {
+    const res = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 200,
+        messages: [{
+          role: "user",
+          content: "Translate this English text to Italian. Reply with ONLY the Italian translation, nothing else: " + text
+        }]
+      })
+    });
+    const data = await res.json();
+    const translation = data.content?.[0]?.text || "Traduzione non disponibile";
+    const bubble = document.createElement("div");
+    bubble.className = "translation-bubble";
+    bubble.textContent = "🇮🇹 " + translation;
+    container.appendChild(bubble);
+    if (btn) btn.textContent = "🇮🇹";
+  } catch(e) {
+    if (btn) btn.textContent = "🇮🇹";
+  }
+}
 </script>
 </body>
 </html>
