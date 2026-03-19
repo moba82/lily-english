@@ -208,6 +208,16 @@ body {
     <p>Your friendly English teacher.<br/>Let's practise together!</p>
     <button class="primary-btn" onclick="showTopics()">Let's start! ✨</button>
   </div>
+  <!-- CALENDAR -->
+  <div class="calendar-wrap">
+    <div class="calendar-header">
+      <button class="cal-nav" onclick="calPrev()">‹</button>
+      <h3 id="cal-title"></h3>
+      <button class="cal-nav" onclick="calNext()">›</button>
+    </div>
+    <div class="cal-grid" id="cal-grid"></div>
+    <div class="cal-streak" id="cal-streak"></div>
+  </div>
 </div>
 
 <!-- TOPICS -->
@@ -276,7 +286,9 @@ STRICT LANGUAGE RULES:
 - Always add one short encouragement: "Great!", "Well done!", "Good job!", "Excellent!".
 - Use 1-2 emojis per reply to feel warm.
 
-STRICT TOPIC RULE: Only discuss the chosen topic and English practice. If asked anything off-topic, reply: "Let's keep practising English! 😊" and redirect.`;
+STRICT TOPIC RULE: Only discuss the chosen topic and English practice. If asked anything off-topic, reply: "Let's keep practising English! 😊" and redirect.
+
+CORRECTION RULE: When the student makes a grammar or vocabulary mistake, always add at the end of your reply on a new line: "💡 Did you mean: [correct version]?" For example if they write "I have went" add "💡 Did you mean: I went?"`;
 
 // ── TOPICS ──
 const TOPICS = [
