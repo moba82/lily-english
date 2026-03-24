@@ -130,6 +130,79 @@ body {
 ::-webkit-scrollbar { width:5px; }
 ::-webkit-scrollbar-thumb { background:#86efac; border-radius:10px; }
 
+/* ── QUIZ ── */
+.quiz-shell {
+  width:100%; height:calc(100vh - 40px);
+  background:rgba(255,255,255,0.96); border-radius:28px;
+  box-shadow:0 16px 56px rgba(20,160,100,0.14);
+  display:flex; flex-direction:column; overflow:hidden;
+  border:1.5px solid rgba(134,239,172,0.45);
+}
+.quiz-topbar {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:12px 16px; border-bottom:1.5px solid #bbf7d0;
+  background:rgba(240,253,248,0.95); flex-shrink:0;
+}
+.quiz-body {
+  flex:1; display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  padding:24px 20px; gap:20px; overflow-y:auto;
+}
+.quiz-progress {
+  width:100%; max-width:400px;
+  height:8px; background:#d1fae5; border-radius:10px; overflow:hidden;
+}
+.quiz-progress-bar {
+  height:100%; background:linear-gradient(90deg,#34d399,#059669);
+  border-radius:10px; transition:width .4s ease;
+}
+.quiz-card {
+  background:white; border-radius:24px; padding:32px 28px;
+  text-align:center; width:100%; max-width:400px;
+  box-shadow:0 8px 32px rgba(0,0,0,0.08);
+  border:2px solid #bbf7d0;
+}
+.quiz-label { font-size:13px; font-weight:800; color:#6ee7b7; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }
+.quiz-word { font-family:"Baloo 2",cursive; font-size:32px; color:#065f46; margin-bottom:4px; }
+.quiz-hint { font-size:13px; color:#9ca3af; margin-bottom:20px; }
+.quiz-input {
+  width:100%; border:2px solid #bbf7d0; border-radius:14px;
+  padding:14px 18px; font-size:18px; font-family:"Nunito",sans-serif;
+  font-weight:700; outline:none; color:#065f46; text-align:center;
+  transition:border .2s;
+}
+.quiz-input:focus { border-color:#34d399; }
+.quiz-input.correct { border-color:#22c55e; background:#f0fdf4; color:#15803d; }
+.quiz-input.wrong   { border-color:#f87171; background:#fef2f2; color:#dc2626; }
+.quiz-feedback {
+  font-size:15px; font-weight:800; min-height:24px; margin-top:4px;
+}
+.quiz-feedback.correct { color:#15803d; }
+.quiz-feedback.wrong   { color:#dc2626; }
+.quiz-btn {
+  background:linear-gradient(135deg,#34d399,#059669); color:white;
+  border:none; border-radius:16px; padding:14px 36px;
+  font-size:18px; font-weight:900; font-family:"Nunito",sans-serif;
+  cursor:pointer; box-shadow:0 4px 14px rgba(5,150,105,0.35);
+  transition:transform .15s; width:100%; max-width:400px;
+}
+.quiz-btn:hover { transform:scale(1.02); }
+.quiz-btn.pink {
+  background:linear-gradient(135deg,#f472b6,#ec4899);
+  box-shadow:0 4px 14px rgba(236,72,153,0.35);
+}
+.quiz-score-card {
+  background:white; border-radius:24px; padding:36px 28px;
+  text-align:center; width:100%; max-width:400px;
+  box-shadow:0 8px 32px rgba(0,0,0,0.08); border:2px solid #bbf7d0;
+}
+.quiz-score-big { font-family:"Baloo 2",cursive; font-size:64px; color:#059669; line-height:1; }
+.quiz-score-label { font-size:16px; font-weight:700; color:#6b7280; margin:8px 0 20px; }
+.quiz-wrong-list { text-align:left; margin-top:16px; }
+.quiz-wrong-item { font-size:14px; color:#6b7280; padding:6px 0; border-bottom:1px solid #f0fdf4; font-weight:600; }
+.quiz-wrong-item span { color:#dc2626; }
+.quiz-wrong-item b { color:#059669; }
+
 /* ── CALENDAR ── */
 .calendar-wrap {
   width:100%; max-width:380px; margin:20px auto 0;
@@ -229,6 +302,9 @@ body {
       </div>
       <h2>What do you want to talk about? 🌸</h2>
     </div>
+    <button class="quiz-btn pink" onclick="showScreen('screen-quiz')" style="margin-bottom:14px;font-size:16px;padding:12px 24px;">
+      🎯 Vocabulary Quiz — Housework
+    </button>
     <div class="topic-grid" id="topic-grid"></div>
   </div>
 </div>
@@ -603,6 +679,170 @@ function calNext() { calMonth++; if(calMonth>11){calMonth=0;calYear++;} renderCa
 // init calendar on load
 window.addEventListener("load", () => { setTimeout(renderCalendar, 500); });
 
+// ── VOCABULARY QUIZ ──
+const WORDS = [
+  { it: "bidone",                              en: "bin" },
+  { it: "scopa",                               en: "broom" },
+  { it: "secchio",                             en: "bucket" },
+  { it: "pulire il bagno",                     en: "clean the bathroom" },
+  { it: "panno da cucina / strofinaccio",      en: "dishcloth" },
+  { it: "piatti",                              en: "dishes" },
+  { it: "cucinare / far da mangiare",          en: "do the cooking" },
+  { it: "spolverare",                          en: "do the dusting" },
+  { it: "stirare",                             en: "do the ironing" },
+  { it: "passare l'aspirapolvere",             en: "do the vacuuming" },
+  { it: "fare il bucato",                      en: "do the washing" },
+  { it: "lavare i piatti / rigovernare",       en: "do the washing-up" },
+  { it: "asciugare i piatti",                  en: "dry the dishes" },
+  { it: "piumino / panno da spolvero",         en: "duster" },
+  { it: "dar da mangiare al cane",             en: "feed the dog" },
+  { it: "ferro da stiro",                      en: "iron" },
+  { it: "asse da stiro",                       en: "ironing board" },
+  { it: "apparecchiare / sparecchiare la tavola", en: "lay/clear the table" },
+  { it: "caricare / scaricare la lavastoviglie",  en: "load/unload the dishwasher" },
+  { it: "fare il letto",                       en: "make my bed" },
+  { it: "mocio",                               en: "mop" },
+  { it: "passare lo straccio sul pavimento",   en: "mop the floor" },
+  { it: "mettere via",                         en: "put something away" },
+  { it: "portare fuori la spazzatura",         en: "put the rubbish out" },
+  { it: "spazzare il pavimento",               en: "sweep the floor" },
+  { it: "salvietta / canovaccio",              en: "tea towel" },
+  { it: "riordinare la stanza",                en: "tidy my room" },
+  { it: "mettere in ordine",                   en: "tidy up" },
+  { it: "aspirapolvere",                       en: "vacuum cleaner" },
+  { it: "lavare i piatti",                     en: "wash the dishes" },
+];
+
+let quizQueue = [], quizIndex = 0, quizScore = 0, quizWrong = [];
+let quizAnswered = false;
+
+function normalize(s) {
+  return s.toLowerCase().trim()
+    .replace(/['']/g, "'")
+    .replace(/\s+/g, ' ')
+    .replace(/^(the|a|an) /, '');
+}
+
+function isCorrect(input, correct) {
+  const i = normalize(input);
+  const c = normalize(correct);
+  if (i === c) return true;
+  // accept without articles
+  const alts = correct.split('/').map(x => normalize(x.trim()));
+  return alts.some(a => i === a);
+}
+
+function startQuiz() {
+  quizQueue = [...WORDS].sort(() => Math.random() - 0.5);
+  quizIndex = 0; quizScore = 0; quizWrong = [];
+  showQuestion();
+}
+
+function showQuestion() {
+  quizAnswered = false;
+  const w = quizQueue[quizIndex];
+  const total = quizQueue.length;
+  document.getElementById('quiz-counter').textContent = (quizIndex+1) + ' / ' + total;
+  const pct = (quizIndex / total * 100) + '%';
+
+  document.getElementById('quiz-body').innerHTML = `
+    <div class="quiz-progress" style="width:100%;max-width:400px;">
+      <div class="quiz-progress-bar" style="width:${pct}"></div>
+    </div>
+    <div class="quiz-card">
+      <div class="quiz-label">Come si dice in inglese?</div>
+      <div class="quiz-word">${w.it}</div>
+      <div class="quiz-hint">Scrivi la parola in inglese</div>
+      <input class="quiz-input" id="quiz-input" type="text"
+        placeholder="..." autocomplete="off" autocorrect="off" spellcheck="false"
+        onkeydown="quizKey(event)"/>
+      <div class="quiz-feedback" id="quiz-feedback"></div>
+    </div>
+    <button class="quiz-btn" id="quiz-action-btn" onclick="checkAnswer()">Controlla ✓</button>
+  `;
+  setTimeout(() => {
+    const inp = document.getElementById('quiz-input');
+    if (inp) inp.focus();
+  }, 100);
+}
+
+function quizKey(e) {
+  if (e.key === 'Enter') {
+    if (!quizAnswered) checkAnswer();
+    else nextQuestion();
+  }
+}
+
+function checkAnswer() {
+  if (quizAnswered) return;
+  quizAnswered = true;
+  const w = quizQueue[quizIndex];
+  const input = document.getElementById('quiz-input');
+  const feedback = document.getElementById('quiz-feedback');
+  const btn = document.getElementById('quiz-action-btn');
+  const val = input.value.trim();
+  if (!val) return;
+
+  if (isCorrect(val, w.en)) {
+    quizScore++;
+    input.classList.add('correct');
+    feedback.className = 'quiz-feedback correct';
+    feedback.textContent = '✅ Corretto! Well done!';
+  } else {
+    input.classList.add('wrong');
+    feedback.className = 'quiz-feedback wrong';
+    feedback.innerHTML = '❌ La risposta è: <b>' + w.en + '</b>';
+    quizWrong.push(w);
+  }
+  btn.textContent = quizIndex < quizQueue.length - 1 ? 'Avanti →' : 'Risultati 🏆';
+  btn.onclick = nextQuestion;
+}
+
+function nextQuestion() {
+  quizIndex++;
+  if (quizIndex >= quizQueue.length) {
+    showResults();
+  } else {
+    showQuestion();
+  }
+}
+
+function showResults() {
+  const total = quizQueue.length;
+  const pct = Math.round(quizScore / total * 100);
+  const emoji = pct === 100 ? '🏆' : pct >= 70 ? '🌟' : pct >= 40 ? '💪' : '📚';
+  const msg = pct === 100 ? 'Perfetto!' : pct >= 70 ? 'Ottimo lavoro!' : pct >= 40 ? 'Continua così!' : 'Riprova, ci riuscirai!';
+
+  let wrongHTML = '';
+  if (quizWrong.length > 0) {
+    wrongHTML = '<div class="quiz-wrong-list"><b style="font-size:13px;color:#6b7280;">Da ripassare:</b>';
+    quizWrong.forEach(w => {
+      wrongHTML += `<div class="quiz-wrong-item">${w.it} → <b>${w.en}</b></div>`;
+    });
+    wrongHTML += '</div>';
+  }
+
+  document.getElementById('quiz-counter').textContent = '';
+  document.getElementById('quiz-body').innerHTML = `
+    <div class="quiz-score-card">
+      <div style="font-size:48px;margin-bottom:4px;">${emoji}</div>
+      <div class="quiz-score-big">${quizScore}/${total}</div>
+      <div class="quiz-score-label">${msg} (${pct}%)</div>
+      ${wrongHTML}
+    </div>
+    <button class="quiz-btn" onclick="startQuiz()">🔄 Ricomincia</button>
+    <button class="quiz-btn pink" onclick="showScreen('screen-topics')" style="margin-top:8px;">← Topics</button>
+  `;
+  savePracticeDay();
+}
+
+// Auto-start quiz when screen is shown
+const _origShowScreen = showScreen;
+window.showScreen = function(id) {
+  _origShowScreen(id);
+  if (id === 'screen-quiz') startQuiz();
+};
+
 // ── TRANSLATION ──
 async function translateMsg(text, container) {
   // remove existing translation
@@ -635,5 +875,20 @@ async function translateMsg(text, container) {
   }
 }
 </script>
+<!-- ══ QUIZ ══ -->
+<div id="screen-quiz" class="screen">
+  <div class="quiz-shell">
+    <div class="quiz-topbar">
+      <button class="back-btn" onclick="showScreen('screen-topics')">← Topics</button>
+      <span style="font-weight:800;color:#059669;font-size:15px;">🎯 Vocabulary Quiz</span>
+      <span id="quiz-counter" style="font-weight:800;color:#6ee7b7;font-size:13px;"></span>
+    </div>
+    <div class="quiz-body" id="quiz-body">
+      <!-- populated by JS -->
+    </div>
+  </div>
+</div>
+
+
 </body>
 </html>
