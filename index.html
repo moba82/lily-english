@@ -202,6 +202,32 @@ body {
 .quiz-wrong-item { font-size:14px; color:#6b7280; padding:6px 0; border-bottom:1px solid #f0fdf4; font-weight:600; }
 .quiz-wrong-item span { color:#dc2626; }
 .quiz-wrong-item b { color:#059669; }
+.verb-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; width:100%; max-width:440px; }
+.verb-col-head { font-size:11px; font-weight:900; text-align:center; color:#6ee7b7; text-transform:uppercase; letter-spacing:1px; padding:4px 0; }
+.verb-base { font-family:"Baloo 2",cursive; font-size:22px; color:#065f46; text-align:center; padding:12px 8px; background:#f0fdf4; border-radius:12px; border:2px solid #bbf7d0; font-weight:800; }
+.verb-input { width:100%; border:2px solid #bbf7d0; border-radius:12px; padding:10px 8px; font-size:15px; font-family:"Nunito",sans-serif; font-weight:700; outline:none; color:#065f46; text-align:center; transition:border .2s; }
+.verb-input:focus { border-color:#34d399; }
+.verb-input.correct { border-color:#22c55e; background:#f0fdf4; color:#15803d; }
+.verb-input.wrong { border-color:#f87171; background:#fef2f2; color:#dc2626; }
+.verb-answer { font-size:12px; font-weight:800; color:#15803d; text-align:center; min-height:16px; margin-top:2px; }
+.grammar-card { background:white; border-radius:20px; padding:24px 20px; width:100%; max-width:440px; border:2px solid #bbf7d0; box-shadow:0 4px 20px rgba(0,0,0,0.07); }
+.grammar-type { font-size:11px; font-weight:900; color:#f472b6; text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; }
+.grammar-question { font-size:16px; font-weight:700; color:#1f2937; line-height:1.6; margin-bottom:16px; }
+.mc-options { display:flex; flex-direction:column; gap:8px; }
+.mc-btn { border:2px solid #bbf7d0; border-radius:12px; padding:10px 16px; font-size:15px; font-weight:700; font-family:"Nunito",sans-serif; cursor:pointer; background:white; color:#065f46; text-align:left; transition:all .15s; }
+.mc-btn:hover { background:#f0fdf4; border-color:#34d399; }
+.mc-btn.correct { background:#f0fdf4; border-color:#22c55e; color:#15803d; }
+.mc-btn.wrong { background:#fef2f2; border-color:#f87171; color:#dc2626; }
+.mc-btn.show-correct { background:#f0fdf4; border-color:#22c55e; color:#15803d; }
+.fill-row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+.fill-input { border:2px solid #bbf7d0; border-radius:10px; padding:8px 12px; font-size:15px; font-family:"Nunito",sans-serif; font-weight:700; outline:none; color:#065f46; min-width:120px; transition:border .2s; }
+.fill-input:focus { border-color:#34d399; }
+.fill-input.correct { border-color:#22c55e; background:#f0fdf4; color:#15803d; }
+.fill-input.wrong { border-color:#f87171; background:#fef2f2; color:#dc2626; }
+.grammar-feedback { font-size:14px; font-weight:800; margin-top:10px; min-height:20px; }
+.grammar-feedback.correct { color:#15803d; }
+.grammar-feedback.wrong { color:#dc2626; }
+.grammar-explanation { font-size:13px; color:#6b7280; margin-top:6px; font-weight:600; font-style:italic; }
 
 /* ── CALENDAR ── */
 .calendar-wrap {
@@ -302,8 +328,14 @@ body {
       </div>
       <h2>What do you want to talk about? 🌸</h2>
     </div>
-    <button class="quiz-btn pink" onclick="showScreen('screen-quiz')" style="margin-bottom:14px;font-size:16px;padding:12px 24px;">
+    <button class="quiz-btn pink" onclick="showScreen('screen-quiz')" style="margin-bottom:6px;font-size:15px;padding:11px 20px;">
       🎯 Vocabulary Quiz — Housework
+    </button>
+    <button class="quiz-btn" onclick="showScreen('screen-verbquiz')" style="margin-bottom:6px;font-size:15px;padding:11px 20px;background:linear-gradient(135deg,#34d399,#059669);">
+      🔤 Irregular Verbs — 3 Forms
+    </button>
+    <button class="quiz-btn" onclick="showScreen('screen-grammarquiz')" style="margin-bottom:14px;font-size:15px;padding:11px 20px;background:linear-gradient(135deg,#fb923c,#ea580c);">
+      📝 Grammar Exercises
     </button>
     <div class="topic-grid" id="topic-grid"></div>
   </div>
@@ -843,6 +875,162 @@ window.showScreen = function(id) {
   if (id === 'screen-quiz') startQuiz();
 };
 
+// ── IRREGULAR VERBS QUIZ ──
+const IRREGULAR_VERBS = [
+  {base:"be",ps:"was/were",pp:"been"},{base:"become",ps:"became",pp:"become"},
+  {base:"begin",ps:"began",pp:"begun"},{base:"bite",ps:"bit",pp:"bitten"},
+  {base:"blow",ps:"blew",pp:"blown"},{base:"break",ps:"broke",pp:"broken"},
+  {base:"bring",ps:"brought",pp:"brought"},{base:"build",ps:"built",pp:"built"},
+  {base:"buy",ps:"bought",pp:"bought"},{base:"catch",ps:"caught",pp:"caught"},
+  {base:"choose",ps:"chose",pp:"chosen"},{base:"come",ps:"came",pp:"come"},
+  {base:"do",ps:"did",pp:"done"},{base:"draw",ps:"drew",pp:"drawn"},
+  {base:"drink",ps:"drank",pp:"drunk"},{base:"drive",ps:"drove",pp:"driven"},
+  {base:"eat",ps:"ate",pp:"eaten"},{base:"fall",ps:"fell",pp:"fallen"},
+  {base:"feel",ps:"felt",pp:"felt"},{base:"find",ps:"found",pp:"found"},
+  {base:"fly",ps:"flew",pp:"flown"},{base:"forget",ps:"forgot",pp:"forgotten"},
+  {base:"get",ps:"got",pp:"got"},{base:"give",ps:"gave",pp:"given"},
+  {base:"go",ps:"went",pp:"gone"},{base:"grow",ps:"grew",pp:"grown"},
+  {base:"have",ps:"had",pp:"had"},{base:"hear",ps:"heard",pp:"heard"},
+  {base:"know",ps:"knew",pp:"known"},{base:"leave",ps:"left",pp:"left"},
+  {base:"lose",ps:"lost",pp:"lost"},{base:"make",ps:"made",pp:"made"},
+  {base:"meet",ps:"met",pp:"met"},{base:"pay",ps:"paid",pp:"paid"},
+  {base:"read",ps:"read",pp:"read"},{base:"ride",ps:"rode",pp:"ridden"},
+  {base:"run",ps:"ran",pp:"run"},{base:"say",ps:"said",pp:"said"},
+  {base:"see",ps:"saw",pp:"seen"},{base:"sell",ps:"sold",pp:"sold"},
+  {base:"send",ps:"sent",pp:"sent"},{base:"sing",ps:"sang",pp:"sung"},
+  {base:"sit",ps:"sat",pp:"sat"},{base:"sleep",ps:"slept",pp:"slept"},
+  {base:"speak",ps:"spoke",pp:"spoken"},{base:"spend",ps:"spent",pp:"spent"},
+  {base:"stand",ps:"stood",pp:"stood"},{base:"steal",ps:"stole",pp:"stolen"},
+  {base:"swim",ps:"swam",pp:"swum"},{base:"take",ps:"took",pp:"taken"},
+  {base:"teach",ps:"taught",pp:"taught"},{base:"tell",ps:"told",pp:"told"},
+  {base:"think",ps:"thought",pp:"thought"},{base:"throw",ps:"threw",pp:"thrown"},
+  {base:"understand",ps:"understood",pp:"understood"},{base:"wake",ps:"woke",pp:"woken"},
+  {base:"wear",ps:"wore",pp:"worn"},{base:"win",ps:"won",pp:"won"},
+  {base:"write",ps:"wrote",pp:"written"},
+];
+let verbQueue=[],verbIndex=0,verbScore=0,verbWrong=[],verbAnswered=false;
+function startVerbQuiz(){verbQueue=[...IRREGULAR_VERBS].sort(()=>Math.random()-0.5).slice(0,20);verbIndex=0;verbScore=0;verbWrong=[];showVerbQuestion();}
+function showVerbQuestion(){
+  verbAnswered=false;
+  const v=verbQueue[verbIndex],total=verbQueue.length;
+  document.getElementById('verbquiz-counter').textContent=(verbIndex+1)+' / '+total;
+  const pct=(verbIndex/total*100)+'%';
+  document.getElementById('verbquiz-body').innerHTML=`
+    <div class="quiz-progress" style="width:100%;max-width:440px;"><div class="quiz-progress-bar" style="width:${pct}"></div></div>
+    <div class="quiz-card" style="max-width:440px;">
+      <div class="quiz-label">Completa le 3 forme</div>
+      <div class="verb-grid">
+        <div class="verb-col-head">Base form</div><div class="verb-col-head">Past Simple</div><div class="verb-col-head">Past Participle</div>
+        <div class="verb-base">${v.base}</div>
+        <div><input class="verb-input" id="v-ps" placeholder="..." autocomplete="off" autocorrect="off" spellcheck="false" onkeydown="verbKey(event)"/><div class="verb-answer" id="ans-ps"></div></div>
+        <div><input class="verb-input" id="v-pp" placeholder="..." autocomplete="off" autocorrect="off" spellcheck="false" onkeydown="verbKey(event)"/><div class="verb-answer" id="ans-pp"></div></div>
+      </div>
+    </div>
+    <button class="quiz-btn" id="verb-action-btn" onclick="checkVerb()">Controlla ✓</button>`;
+  setTimeout(()=>{const i=document.getElementById('v-ps');if(i)i.focus();},100);
+}
+function verbKey(e){if(e.key==='Enter'){if(!verbAnswered)checkVerb();else nextVerb();}}
+function checkVerb(){
+  if(verbAnswered)return; verbAnswered=true;
+  const v=verbQueue[verbIndex];
+  const psVal=document.getElementById('v-ps').value.trim().toLowerCase();
+  const ppVal=document.getElementById('v-pp').value.trim().toLowerCase();
+  const psOk=v.ps.split('/').map(x=>x.trim()).includes(psVal);
+  const ppOk=v.pp.split('/').map(x=>x.trim()).includes(ppVal);
+  const psEl=document.getElementById('v-ps'),ppEl=document.getElementById('v-pp');
+  const apsEl=document.getElementById('ans-ps'),appEl=document.getElementById('ans-pp');
+  if(psOk){psEl.classList.add('correct');apsEl.textContent='✅';}else{psEl.classList.add('wrong');apsEl.textContent='→ '+v.ps;apsEl.style.color='#dc2626';}
+  if(ppOk){ppEl.classList.add('correct');appEl.textContent='✅';}else{ppEl.classList.add('wrong');appEl.textContent='→ '+v.pp;appEl.style.color='#dc2626';}
+  if(psOk&&ppOk)verbScore++;else verbWrong.push(v);
+  const btn=document.getElementById('verb-action-btn');
+  btn.textContent=verbIndex<verbQueue.length-1?'Avanti →':'Risultati 🏆';btn.onclick=nextVerb;
+}
+function nextVerb(){verbIndex++;if(verbIndex>=verbQueue.length)showVerbResults();else showVerbQuestion();}
+function showVerbResults(){
+  const total=verbQueue.length,pct=Math.round(verbScore/total*100);
+  const emoji=pct===100?'🏆':pct>=70?'🌟':pct>=40?'💪':'📚';
+  const msg=pct===100?'Perfetto!':pct>=70?'Ottimo!':pct>=40?'Continua!':'Riprova!';
+  let wHTML='';
+  if(verbWrong.length>0){wHTML='<div class="quiz-wrong-list"><b style="font-size:13px;color:#6b7280;">Da ripassare:</b>';verbWrong.forEach(v=>{wHTML+=`<div class="quiz-wrong-item">${v.base} → <b>${v.ps}</b> → <b>${v.pp}</b></div>`;});wHTML+='</div>';}
+  document.getElementById('verbquiz-counter').textContent='';
+  document.getElementById('verbquiz-body').innerHTML=`<div class="quiz-score-card"><div style="font-size:48px">${emoji}</div><div class="quiz-score-big">${verbScore}/${total}</div><div class="quiz-score-label">${msg} (${pct}%)</div>${wHTML}</div><button class="quiz-btn" onclick="startVerbQuiz()">🔄 Ricomincia</button><button class="quiz-btn pink" onclick="showScreen('screen-topics')" style="margin-top:8px;">← Topics</button>`;
+  savePracticeDay();
+}
+
+// ── GRAMMAR EXERCISES ──
+const GRAMMAR_EX=[
+  {type:"fill",topic:"Past Simple — Regular",before:"Yesterday I",blank:"listened",after:"to music for two hours.",hint:"listen → ?"},
+  {type:"fill",topic:"Past Simple — Regular",before:"She",blank:"studied",after:"English last night.",hint:"study → ?"},
+  {type:"fill",topic:"Past Simple — Regular",before:"They",blank:"planned",after:"a trip last summer.",hint:"plan → ?"},
+  {type:"fill",topic:"Past Simple — Irregular",before:"He",blank:"went",after:"to the cinema yesterday.",hint:"go → ?"},
+  {type:"fill",topic:"Past Simple — Irregular",before:"We",blank:"ate",after:"pizza for dinner.",hint:"eat → ?"},
+  {type:"fill",topic:"Past Simple — Irregular",before:"She",blank:"wrote",after:"a letter to her friend.",hint:"write → ?"},
+  {type:"mc",topic:"Forma Negativa",question:"Scegli la forma negativa corretta di: 'He scored a goal.'",options:["He didn't scored a goal.","He didn't score a goal.","He doesn't scored a goal.","He not score a goal."],correct:1,explanation:"Negativa: soggetto + didn't + verbo BASE"},
+  {type:"mc",topic:"Forma Negativa",question:"Quale frase è corretta?",options:["They not went to school.","They didn't went to school.","They didn't go to school.","They don't go to school yesterday."],correct:2,explanation:"didn't + verbo BASE (non la forma irregolare!)"},
+  {type:"mc",topic:"Forma Negativa — be",question:"Forma negativa di 'She was at home':",options:["She wasn't at home.","She didn't was at home.","She didn't be at home.","She not was at home."],correct:0,explanation:"Be è speciale: was/were + NOT (senza did)"},
+  {type:"mc",topic:"Forma Interrogativa",question:"Come si trasforma in domanda? 'You watched TV yesterday.'",options:["Watched you TV yesterday?","Did you watched TV yesterday?","Did you watch TV yesterday?","Do you watch TV yesterday?"],correct:2,explanation:"Interrogativa: Did + soggetto + verbo BASE + ?"},
+  {type:"fill",topic:"Forma Interrogativa",before:"",blank:"Did",after:"they go to Rome? Yes, they did.",hint:"Inizia la domanda con...?"},
+  {type:"mc",topic:"Who/What come soggetto",question:"Quale frase è corretta?",options:["Who did went shopping?","Who went shopping?","Did who go shopping?","Who does went shopping?"],correct:1,explanation:"Con Who/What come soggetto NON si usa did"},
+  {type:"mc",topic:"Have to — Affermativa",question:"'Devo andare a scuola.' Come si dice?",options:["I must to go to school.","I have go to school.","I have to go to school.","I has to go to school."],correct:2,explanation:"have to + verbo BASE = obbligo esterno"},
+  {type:"mc",topic:"Have to — Negativa",question:"'Non devo alzarmi presto.' (non c'è obbligo)",options:["I mustn't get up early.","I don't have to get up early.","I hasn't to get up early.","I didn't have get up early."],correct:1,explanation:"don't have to = non c'è necessità (≠ mustn't = è vietato)"},
+  {type:"mc",topic:"Have to — Interrogativa",question:"Forma interrogativa corretta:",options:["Have you to tidy your room?","Do you have to tidy your room?","Does you have to tidy your room?","You have to tidy your room?"],correct:1,explanation:"Do/Does + soggetto + have to + verbo BASE"},
+  {type:"fill",topic:"Have to — Past",before:"Yesterday Tom",blank:"had to",after:"stay at home as a punishment.",hint:"Past di 'have to' = ?"},
+];
+let gramQueue=[],gramIndex=0,gramScore=0,gramWrong=[],gramAnswered=false;
+function startGrammarQuiz(){gramQueue=[...GRAMMAR_EX].sort(()=>Math.random()-0.5);gramIndex=0;gramScore=0;gramWrong=[];showGramQuestion();}
+function showGramQuestion(){
+  gramAnswered=false;
+  const q=gramQueue[gramIndex],total=gramQueue.length;
+  document.getElementById('grammar-counter').textContent=(gramIndex+1)+' / '+total;
+  const pct=(gramIndex/total*100)+'%';
+  let bHTML=`<div class="quiz-progress" style="width:100%;max-width:440px;"><div class="quiz-progress-bar" style="width:${pct};background:linear-gradient(90deg,#fb923c,#ea580c);"></div></div><div class="grammar-card"><div class="grammar-type">${q.topic}</div>`;
+  if(q.type==='mc'){
+    bHTML+=`<div class="grammar-question">${q.question}</div><div class="mc-options">`;
+    q.options.forEach((opt,i)=>{bHTML+=`<button class="mc-btn" id="mc-${i}" onclick="checkMC(${i})">${opt}</button>`;});
+    bHTML+=`</div>`;
+  }else{
+    bHTML+=`<div class="grammar-question">Completa la frase: <span style="color:#9ca3af;font-size:13px;">(${q.hint})</span></div><div class="fill-row" style="font-size:16px;font-weight:700;color:#1f2937;"><span>${q.before}</span><input class="fill-input" id="gram-fill" placeholder="..." autocomplete="off" autocorrect="off" spellcheck="false" onkeydown="gramKey(event)" style="width:130px;"/><span>${q.after}</span></div>`;
+  }
+  bHTML+=`<div class="grammar-feedback" id="gram-feedback"></div><div class="grammar-explanation" id="gram-explanation"></div></div><button class="quiz-btn" id="gram-action-btn" style="background:linear-gradient(135deg,#fb923c,#ea580c);box-shadow:0 4px 14px rgba(234,88,12,0.35);" onclick="${q.type==='mc'?'':'checkFill()'}">Controlla ✓</button>`;
+  document.getElementById('grammarquiz-body').innerHTML=bHTML;
+  if(q.type==='fill')setTimeout(()=>{const i=document.getElementById('gram-fill');if(i)i.focus();},100);
+}
+function gramKey(e){if(e.key==='Enter'){if(!gramAnswered)checkFill();else nextGram();}}
+function checkMC(chosen){
+  if(gramAnswered)return; gramAnswered=true;
+  const q=gramQueue[gramIndex];
+  q.options.forEach((_,i)=>{const el=document.getElementById('mc-'+i);if(i===q.correct)el.classList.add('show-correct');else if(i===chosen&&chosen!==q.correct)el.classList.add('wrong');el.disabled=true;});
+  const fb=document.getElementById('gram-feedback'),ex=document.getElementById('gram-explanation'),btn=document.getElementById('gram-action-btn');
+  if(chosen===q.correct){gramScore++;fb.className='grammar-feedback correct';fb.textContent='✅ Corretto! Well done!';}
+  else{gramWrong.push(q);fb.className='grammar-feedback wrong';fb.textContent='❌ Risposta sbagliata!';}
+  if(q.explanation)ex.textContent='💡 '+q.explanation;
+  btn.textContent=gramIndex<gramQueue.length-1?'Avanti →':'Risultati 🏆';btn.onclick=nextGram;
+}
+function checkFill(){
+  if(gramAnswered)return; gramAnswered=true;
+  const q=gramQueue[gramIndex],inp=document.getElementById('gram-fill');
+  const val=inp.value.trim().toLowerCase(),correct=q.blank.toLowerCase();
+  const alts=correct.split('/').map(x=>x.trim());
+  const fb=document.getElementById('gram-feedback'),ex=document.getElementById('gram-explanation'),btn=document.getElementById('gram-action-btn');
+  if(alts.includes(val)){gramScore++;inp.classList.add('correct');fb.className='grammar-feedback correct';fb.textContent='✅ Corretto! Well done!';}
+  else{gramWrong.push(q);inp.classList.add('wrong');fb.className='grammar-feedback wrong';fb.innerHTML='❌ Risposta: <b>'+q.blank+'</b>';}
+  if(q.explanation)ex.textContent='💡 '+q.explanation;
+  btn.textContent=gramIndex<gramQueue.length-1?'Avanti →':'Risultati 🏆';btn.onclick=nextGram;
+}
+function nextGram(){gramIndex++;if(gramIndex>=gramQueue.length)showGramResults();else showGramQuestion();}
+function showGramResults(){
+  const total=gramQueue.length,pct=Math.round(gramScore/total*100);
+  const emoji=pct===100?'🏆':pct>=70?'🌟':pct>=40?'💪':'📚';
+  const msg=pct===100?'Perfetto!':pct>=70?'Ottimo!':pct>=40?'Continua!':'Riprova!';
+  let wHTML='';
+  if(gramWrong.length>0){wHTML='<div class="quiz-wrong-list"><b style="font-size:13px;color:#6b7280;">Da ripassare:</b>';gramWrong.forEach(q=>{wHTML+=`<div class="quiz-wrong-item"><span>${q.topic}</span></div>`;});wHTML+='</div>';}
+  document.getElementById('grammar-counter').textContent='';
+  document.getElementById('grammarquiz-body').innerHTML=`<div class="quiz-score-card"><div style="font-size:48px">${emoji}</div><div class="quiz-score-big">${gramScore}/${total}</div><div class="quiz-score-label">${msg} (${pct}%)</div>${wHTML}</div><button class="quiz-btn" style="background:linear-gradient(135deg,#fb923c,#ea580c)" onclick="startGrammarQuiz()">🔄 Ricomincia</button><button class="quiz-btn pink" onclick="showScreen('screen-topics')" style="margin-top:8px;">← Topics</button>`;
+  savePracticeDay();
+}
+const _prevShowScreen2=window.showScreen;
+window.showScreen=function(id){_prevShowScreen2(id);if(id==='screen-verbquiz')startVerbQuiz();if(id==='screen-grammarquiz')startGrammarQuiz();};
+
 // ── TRANSLATION ──
 async function translateMsg(text, container) {
   // remove existing translation
@@ -889,6 +1077,29 @@ async function translateMsg(text, container) {
   </div>
 </div>
 
+
+<!-- IRREGULAR VERBS QUIZ -->
+<div id="screen-verbquiz" class="screen">
+  <div class="quiz-shell">
+    <div class="quiz-topbar">
+      <button class="back-btn" onclick="showScreen('screen-topics')">← Topics</button>
+      <span style="font-weight:800;color:#059669;font-size:15px;">🔤 Irregular Verbs</span>
+      <span id="verbquiz-counter" style="font-weight:800;color:#6ee7b7;font-size:13px;"></span>
+    </div>
+    <div class="quiz-body" id="verbquiz-body"></div>
+  </div>
+</div>
+<!-- GRAMMAR QUIZ -->
+<div id="screen-grammarquiz" class="screen">
+  <div class="quiz-shell">
+    <div class="quiz-topbar">
+      <button class="back-btn" onclick="showScreen('screen-topics')">← Topics</button>
+      <span style="font-weight:800;color:#ea580c;font-size:15px;">📝 Grammar Exercises</span>
+      <span id="grammar-counter" style="font-weight:800;color:#fdba74;font-size:13px;"></span>
+    </div>
+    <div class="quiz-body" id="grammarquiz-body"></div>
+  </div>
+</div>
 
 </body>
 </html>
