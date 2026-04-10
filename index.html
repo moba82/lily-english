@@ -1,223 +1,261 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Learn with Lily & Lola</title>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Baloo+2:wght@700;800;900&display=swap" rel="stylesheet"/>
+<title>Lily & Lola - English & Spanish</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
 <style>
-/* --- STILI GENERALI --- */
+:root {
+  --mint: #bbf7d0;
+  --mint-dark: #86efac;
+  --pink: #f472b6;
+  --pink-dark: #db2777;
+  --bg: #f0fdf4;
+  --white: #ffffff;
+}
+
 * { box-sizing:border-box; margin:0; padding:0; }
 body {
   min-height:100vh;
-  background:linear-gradient(160deg,#f0fdf8 0%,#fdf0f5 55%,#f0fdf4 100%);
-  font-family:'Nunito',sans-serif;
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  padding:20px 16px;
+  background: var(--bg);
+  font-family: 'Nunito', sans-serif;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 20px 16px;
+  color: #374151;
 }
 
-.screen { display:none; width:100%; max-width:500px; animation: floatUp .5s ease; }
-.screen.active { display:flex; flex-direction:column; align-items:center; }
+.screen { display: none; width: 100%; max-width: 500px; animation: fadeIn 0.3s ease; }
+.screen.active { display: block; }
 
-@keyframes floatUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-/* --- SCHERMATA INIZIALE --- */
-.lang-card {
-  background:white; border-radius:36px; padding:40px 30px; text-align:center;
-  box-shadow:0 16px 40px rgba(0,0,0,0.1); width:100%;
+/* Elementi Comuni */
+.card {
+  background: var(--white);
+  border-radius: 24px;
+  padding: 24px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+  margin-bottom: 20px;
+  text-align: center;
+  border: 4px solid var(--mint);
 }
-.lang-card h1 { font-family:'Baloo 2', cursive; color:#5a2d82; margin-bottom:10px; }
-.lang-selection { display:flex; flex-direction:column; gap:15px; margin-top:20px; }
 
-.btn-choice {
-  border:none; border-radius:24px; padding:20px; cursor:pointer;
-  display:flex; align-items:center; gap:15px; transition: 0.2s;
-  text-align:left; text-decoration:none;
+h1 { color: var(--pink-dark); font-weight: 900; margin-bottom: 10px; }
+p { color: #4b5563; margin-bottom: 20px; }
+
+.btn {
+  background: var(--mint);
+  color: #065f46;
+  border: none;
+  padding: 15px 25px;
+  border-radius: 50px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+  margin-bottom: 12px;
+  font-size: 16px;
+  box-shadow: 0 4px 0 var(--mint-dark);
 }
-.btn-choice:hover { transform: scale(1.02); }
 
-.btn-en { background: #dcfce7; border: 3px solid #86efac; color: #166534; }
-.btn-es { background: #fef3c7; border: 3px solid #fcd34d; color: #92400e; }
+.btn:active { transform: translateY(2px); box-shadow: none; }
+.btn-pink { background: var(--pink); color: white; box-shadow: 0 4px 0 var(--pink-dark); }
 
-.btn-choice img { width: 60px; height: 60px; border-radius: 50%; background: white; }
-.btn-choice .info b { font-size: 20px; display: block; }
-
-/* --- TOPICS & MENU --- */
-.menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; margin-top: 20px; }
-.menu-item {
-  background: white; border: 2px solid #eee; border-radius: 20px; padding: 15px;
-  text-align: center; cursor: pointer; transition: 0.2s; font-weight: 800;
+/* Chat Styles */
+#chat-container {
+  height: 400px;
+  overflow-y: auto;
+  padding: 10px;
+  display: flex; flex-direction: column; gap: 10px;
+  background: #fff;
+  border-radius: 15px;
+  margin-bottom: 15px;
+  border: 2px solid var(--pink);
 }
-.menu-item:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
 
-/* Colori Inglese (Menta/Rosa) */
-.theme-en .menu-item { border-color: #86efac; color: #065f46; }
-.theme-en .topbar { background: #f0fdf4; border-bottom: 2px solid #86efac; }
+.msg { max-width: 80%; padding: 12px; border-radius: 18px; font-weight: 600; position: relative; }
+.msg.lily { align-self: flex-start; background: var(--pink); color: white; border-bottom-left-radius: 2px; }
+.msg.user { align-self: flex-end; background: var(--mint); color: #065f46; border-bottom-right-radius: 2px; }
 
-/* Colori Spagnolo (Giallo/Arancio) */
-.theme-es .menu-item { border-color: #fcd34d; color: #92400e; }
-.theme-es .topbar { background: #fffbeb; border-bottom: 2px solid #fcd34d; }
-
-.topbar {
-  width: 100%; padding: 15px; display: flex; align-items: center; 
-  border-radius: 20px 20px 0 0; gap: 10px;
+.translate-btn {
+  font-size: 12px; margin-top: 5px; display: block; cursor: pointer; text-decoration: underline; opacity: 0.8;
 }
-.back-btn { background: #eee; border: none; padding: 8px 12px; border-radius: 10px; cursor: pointer; font-weight: bold; }
 
-/* --- CHAT STYLES --- */
-.chat-window {
-  width: 100%; height: 500px; background: white; border-radius: 0 0 20px 20px;
-  display: flex; flex-direction: column; overflow: hidden; border: 1px solid #eee;
+.input-area { display: flex; gap: 8px; }
+input[type="text"] {
+  flex: 1; padding: 12px 20px; border-radius: 30px; border: 2px solid var(--mint); outline: none;
 }
-.chat-msgs { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-.msg { padding: 10px 15px; border-radius: 15px; max-width: 80%; font-weight: 600; }
-.msg-bot { align-self: flex-start; background: #f3f4f6; }
-.msg-user { align-self: flex-end; background: #ec4899; color: white; }
-.chat-input { padding: 15px; border-top: 1px solid #eee; display: flex; gap: 10px; }
-.chat-input input { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 10px; }
+
+/* Calendario */
+.calendar-grid {
+  display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 15px;
+}
+.day-circle {
+  width: 30px; height: 30px; border-radius: 50%; background: #e5e7eb;
+  display: flex; align-items: center; justify-content: center; font-size: 10px;
+}
+.day-active { background: var(--mint-dark); color: #065f46; font-weight: bold; }
 
 </style>
 </head>
 <body>
 
-<div id="screen-home" class="screen active">
-  <div class="lang-card">
-    <h1>Ciao Zoe! 🌟</h1>
-    <p>Con chi vuoi studiare oggi?</p>
-    <div class="lang-selection">
-      <button class="btn-choice btn-en" onclick="startApp('en')">
-        <div style="font-size:40px">🇬🇧</div>
-        <div class="info"><b>English with Lily</b><span>Verde Menta & Rosa</span></div>
-      </button>
-      <button class="btn-choice btn-es" onclick="startApp('es')">
-        <div style="font-size:40px">🇪🇸</div>
-        <div class="info"><b>Español con Lola</b><span>Giallo & Arancio</span></div>
-      </button>
+<div id="screen-lang" class="screen active">
+  <div class="card">
+    <div id="lottie-welcome" style="height:150px;"></div>
+    <h1>Hello Zoe!</h1>
+    <p>Choose your language / Elige tu idioma</p>
+    <button class="btn" onclick="startApp('en')">🇬🇧 English with Lily</button>
+    <button class="btn btn-pink" onclick="startApp('es')">🇪🇸 Español con Lola</button>
+  </div>
+</div>
+
+<div id="screen-home" class="screen">
+  <div class="card">
+    <h2 id="home-title" style="color:var(--pink)">Welcome back!</h2>
+    <div id="calendar-container">
+      <p>Your Progress 🔥 <span id="streak-count">0</span> days</p>
+      <div class="calendar-grid" id="calendar-grid"></div>
+    </div>
+    <hr style="margin:20px 0; border:1px solid #eee;">
+    <button class="btn" onclick="showScreen('screen-chat')">💬 Start Chat</button>
+    <button class="btn btn-pink" onclick="showScreen('screen-topics')">📚 Exercises</button>
+    <button class="btn" onclick="showScreen('screen-lang')" style="background:#eee; color:#666; box-shadow:none;">Change Language</button>
+  </div>
+</div>
+
+<div id="screen-chat" class="screen">
+  <div class="card" style="padding:15px;">
+    <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+      <button onclick="showScreen('screen-home')" style="border:none; background:none; cursor:pointer;">⬅️ Back</button>
+      <strong id="chat-with" style="color:var(--pink)">Chat with Lily</strong>
+    </div>
+    <div id="chat-container"></div>
+    <div class="input-area">
+      <input type="text" id="user-input" placeholder="Type a message...">
+      <button class="btn" style="width:auto; margin:0;" onclick="sendMessage()">Send</button>
     </div>
   </div>
 </div>
 
 <div id="screen-topics" class="screen">
-  <div class="topbar" id="topics-bar">
-    <button class="back-btn" onclick="showScreen('screen-home')">← Esci</button>
-    <span id="teacher-name" style="font-weight:900;"></span>
+  <div class="card">
+    <button onclick="showScreen('screen-home')" style="float:left; border:none; background:none;">⬅️</button>
+    <h2 style="color:var(--pink); margin-bottom:20px;">Exercises</h2>
+    <button class="btn" onclick="startVocabQuiz()">🎯 Vocabulary Quiz</button>
+    <button id="btn-verbs" class="btn btn-pink" onclick="startVerbQuiz()">🔤 Irregular Verbs</button>
+    <button class="btn" onclick="startGrammarQuiz()">📝 Grammar Test</button>
+    <button class="btn btn-pink" onclick="startReadingComp()">📖 Reading Comprehension</button>
   </div>
-  <div class="menu-grid" id="topics-grid">
-    </div>
 </div>
 
-<div id="screen-activity" class="screen">
-  <div class="topbar" id="activity-bar">
-    <button class="back-btn" onclick="showScreen('screen-topics')">← Indietro</button>
-    <span id="activity-title" style="font-weight:800;"></span>
-  </div>
-  <div class="chat-window">
-    <div class="chat-msgs" id="chat-msgs"></div>
-    <div class="chat-input">
-      <input type="text" id="user-input" placeholder="Scrivi qui...">
-      <button class="back-btn" style="background:#ec4899; color:white;" onclick="handleInput()">Invia</button>
-    </div>
+<div id="screen-quiz" class="screen">
+  <div class="card">
+    <div id="quiz-content"></div>
   </div>
 </div>
 
 <script>
 let currentLang = 'en';
-
-const content = {
-  en: {
-    teacher: "Lily 🇬🇧",
-    theme: "theme-en",
-    topics: [
-      { id: 'chat', label: '💬 Chat A2', icon: '✨' },
-      { id: 'vocab', label: '🎯 Housework', icon: '🏠' },
-      { id: 'verbs', label: '🔤 Irregular Verbs', icon: '📝' },
-      { id: 'grammar', label: '📝 Grammar', icon: '⚙️' },
-      { id: 'reading', label: '📖 Reading', icon: '📚' }
-    ]
-  },
-  es: {
-    teacher: "Lola 🇪🇸",
-    theme: "theme-es",
-    topics: [
-      { id: 'chat', label: '💬 Chat A2 Spagnolo', icon: '💃' },
-      { id: 'vocab', label: '🎯 Casa y Hogar', icon: '🏡' },
-      { id: 'grammar', label: '📝 Gramática', icon: '✍️' },
-      { id: 'reading', label: '📖 Lectura', icon: '📖' }
-    ]
-  }
-};
+let streak = 0;
+const history = JSON.parse(localStorage.getItem('study_history') || '{}');
 
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
+  if(id === 'screen-home') renderCalendar();
 }
 
 function startApp(lang) {
   currentLang = lang;
-  const config = content[lang];
+  document.getElementById('home-title').innerText = lang === 'en' ? "Hi, I'm Lily! 🌸" : "¡Hola, soy Lola! 💃";
+  document.getElementById('chat-with').innerText = lang === 'en' ? "Chat with Lily" : "Habla con Lola";
   
-  // Imposta tema e nome
-  document.getElementById('screen-topics').className = 'screen active ' + config.theme;
-  document.getElementById('teacher-name').innerText = config.teacher;
+  // Nascondi verbi irregolari per spagnolo se non necessari
+  document.getElementById('btn-verbs').style.display = lang === 'en' ? 'block' : 'none';
   
-  // Genera Bottoni Menu
-  const grid = document.getElementById('topics-grid');
-  grid.innerHTML = '';
-  config.topics.forEach(t => {
-    const btn = document.createElement('div');
-    btn.className = 'menu-item';
-    btn.innerHTML = `<div>${t.icon}</div><div>${t.label}</div>`;
-    btn.onclick = () => openActivity(t);
-    grid.appendChild(btn);
-  });
-  
-  showScreen('screen-topics');
+  showScreen('screen-home');
+  markAttendance();
 }
 
-function openActivity(topic) {
-  const config = content[currentLang];
-  document.getElementById('screen-activity').className = 'screen active ' + config.theme;
-  document.getElementById('activity-title').innerText = topic.label;
+function markAttendance() {
+  const today = new Date().toISOString().split('T')[0];
+  history[today] = true;
+  localStorage.setItem('study_history', JSON.stringify(history));
+}
+
+function renderCalendar() {
+  const grid = document.getElementById('calendar-grid');
+  grid.innerHTML = '';
+  const today = new Date();
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(today.getDate() - i);
+    const dateStr = d.toISOString().split('T')[0];
+    const dayName = d.toLocaleDateString(currentLang, {weekday:'short'});
+    const dot = document.createElement('div');
+    dot.className = `day-circle ${history[dateStr] ? 'day-active' : ''}`;
+    dot.innerHTML = `<div>${dayName}<br>${d.getDate()}</div>`;
+    grid.appendChild(dot);
+  }
+}
+
+// LOGICA CHAT SEMPLIFICATA
+async function sendMessage() {
+  const input = document.getElementById('user-input');
+  const text = input.value.trim();
+  if(!text) return;
+
+  addMessage(text, 'user');
+  input.value = '';
+
+  // Simulazione risposta Lily/Lola (Qui si collega l'API Vercel /api/chat)
+  setTimeout(() => {
+    let response = currentLang === 'en' ? 
+      "That's interesting! Did you mean: 'I want to learn'?" : 
+      "¡Qué bien! ¿Querías decir: 'Quiero aprender'?";
+    addMessage(response, 'lily', "Traduzione: Interessante! Intendevi dire...");
+  }, 1000);
+}
+
+function addMessage(text, sender, translation = "") {
+  const container = document.getElementById('chat-container');
+  const div = document.createElement('div');
+  div.className = `msg ${sender}`;
+  div.innerText = text;
   
-  const msgs = document.getElementById('chat-msgs');
-  msgs.innerHTML = '';
-  
-  // Messaggio di benvenuto personalizzato
-  let welcome = "";
-  if(currentLang === 'en') {
-    welcome = `Hi Zoe! I'm Lily. Ready to practice ${topic.label}?`;
-  } else {
-    welcome = `¡Hola Zoe! Soy Lola. ¿Lista para practicar ${topic.label}?`;
+  if(translation) {
+    const tBtn = document.createElement('span');
+    tBtn.className = 'translate-btn';
+    tBtn.innerText = "🇮🇹 Traduci";
+    tBtn.onclick = () => {
+      const isTranslated = div.innerText.includes(translation);
+      div.innerText = isTranslated ? text : text + "\n\n" + translation;
+    };
+    div.appendChild(tBtn);
   }
   
-  addMsg(welcome, 'bot');
-  showScreen('screen-activity');
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
 }
 
-function addMsg(text, type) {
-  const msgs = document.getElementById('chat-msgs');
-  const div = document.createElement('div');
-  div.className = `msg msg-${type}`;
-  div.innerText = text;
-  msgs.appendChild(div);
-  msgs.scrollTop = msgs.scrollHeight;
-}
+// Inizializzazione Lottie
+lottie.loadAnimation({
+  container: document.getElementById('lottie-welcome'),
+  renderer: 'svg',
+  loop: true,
+  autoplay: true,
+  path: 'https://assets9.lottiefiles.com/packages/lf20_7wwmupbm.json'
+});
 
-function handleInput() {
-  const inp = document.getElementById('user-input');
-  if(!inp.value) return;
-  addMsg(inp.value, 'user');
-  
-  // Semplice risposta simulata
-  setTimeout(() => {
-    const resp = currentLang === 'en' ? "Great! Keep going!" : "¡Muy bien! ¡Sigue así!";
-    addMsg(resp, 'bot');
-  }, 800);
-  
-  inp.value = '';
-}
+// Funzioni Quiz da implementare con le tue liste...
+function startVocabQuiz() { alert("Starting Vocabulary Quiz..."); }
+function startVerbQuiz() { alert("Starting Irregular Verbs..."); }
+function startGrammarQuiz() { alert("Starting Grammar Test..."); }
+function startReadingComp() { alert("Starting Reading Section..."); }
+
 </script>
-
 </body>
 </html>
