@@ -782,4 +782,1397 @@ function renderCalendar() {
   if (calYear === undefined) { calYear = now.getFullYear(); calMonth = now.getMonth(); }
   const days = getPracticedDays();
   const todayStr = now.toISOString().slice(0,10);
-  const months = ["January","February","March","April","May","June","July","August","September","October","November"
+  const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  document.getElementById("cal-title").textContent = months[calMonth] + " " + calYear;
+  const grid = document.getElementById("cal-grid");
+  grid.innerHTML = "";
+  // day names
+  ["Mo","Tu","We","Th","Fr","Sa","Su"].forEach(d => {
+    const el = document.createElement("div");
+    el.className = "cal-dayname"; el.textContent = d;
+    grid.appendChild(el);
+  });
+  const firstDay = new Date(calYear, calMonth, 1).getDay();
+  const offset = (firstDay + 6) % 7; // Monday first
+  const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
+  for (let i = 0; i < offset; i++) {
+    const el = document.createElement("div"); el.className = "cal-day empty"; grid.appendChild(el);
+  }
+  for (let d = 1; d <= daysInMonth; d++) {
+    const el = document.createElement("div");
+    el.className = "cal-day";
+    el.textContent = d;
+    const dateStr = calYear + "-" + String(calMonth+1).padStart(2,"0") + "-" + String(d).padStart(2,"0");
+    if (days.includes(dateStr)) el.classList.add("practiced");
+    if (dateStr === todayStr) el.classList.add("today");
+    grid.appendChild(el);
+  }
+  // streak
+  let streak = 0;
+  const check = new Date();
+  while(true) {
+    const s = check.toISOString().slice(0,10);
+    if (days.includes(s)) { streak++; check.setDate(check.getDate()-1); }
+    else break;
+  }
+  const streakEl = document.getElementById("cal-streak");
+  if (streak > 0) streakEl.textContent = "🔥 " + streak + " day streak! Keep it up!";
+  else streakEl.textContent = "Start your streak today! 💪";
+}
+
+function calPrev() { calMonth--; if(calMonth<0){calMonth=11;calYear--;} renderCalendar(); }
+function calNext() { calMonth++; if(calMonth>11){calMonth=0;calYear++;} renderCalendar(); }
+
+// init calendar on load
+window.addEventListener("load", () => { setTimeout(renderCalendar, 500); });
+
+// ── VOCABULARY QUIZ ──
+const WORDS = [
+  { it: "bidone",                              en: "bin" },
+  { it: "scopa",                               en: "broom" },
+  { it: "secchio",                             en: "bucket" },
+  { it: "pulire il bagno",                     en: "clean the bathroom" },
+  { it: "panno da cucina / strofinaccio",      en: "dishcloth" },
+  { it: "piatti",                              en: "dishes" },
+  { it: "cucinare / far da mangiare",          en: "do the cooking" },
+  { it: "spolverare",                          en: "do the dusting" },
+  { it: "stirare",                             en: "do the ironing" },
+  { it: "passare l'aspirapolvere",             en: "do the vacuuming" },
+  { it: "fare il bucato",                      en: "do the washing" },
+  { it: "lavare i piatti / rigovernare",       en: "do the washing-up" },
+  { it: "asciugare i piatti",                  en: "dry the dishes" },
+  { it: "piumino / panno da spolvero",         en: "duster" },
+  { it: "dar da mangiare al cane",             en: "feed the dog" },
+  { it: "ferro da stiro",                      en: "iron" },
+  { it: "asse da stiro",                       en: "ironing board" },
+  { it: "apparecchiare / sparecchiare la tavola", en: "lay/clear the table" },
+  { it: "caricare / scaricare la lavastoviglie",  en: "load/unload the dishwasher" },
+  { it: "fare il letto",                       en: "make my bed" },
+  { it: "mocio",                               en: "mop" },
+  { it: "passare lo straccio sul pavimento",   en: "mop the floor" },
+  { it: "mettere via",                         en: "put something away" },
+  { it: "portare fuori la spazzatura",         en: "put the rubbish out" },
+  { it: "spazzare il pavimento",               en: "sweep the floor" },
+  { it: "salvietta / canovaccio",              en: "tea towel" },
+  { it: "riordinare la stanza",                en: "tidy my room" },
+  { it: "mettere in ordine",                   en: "tidy up" },
+  { it: "aspirapolvere",                       en: "vacuum cleaner" },
+  { it: "lavare i piatti",                     en: "wash the dishes" },
+];
+
+let quizQueue = [], quizIndex = 0, quizScore = 0, quizWrong = [];
+let quizAnswered = false;
+
+function normalize(s) {
+  return s.toLowerCase().trim()
+    .replace(/['']/g, "'")
+    .replace(/\s+/g, ' ')
+    .replace(/^(the|a|an) /, '');
+}
+
+function isCorrect(input, correct) {
+  const i = normalize(input);
+  const c = normalize(correct);
+  if (i === c) return true;
+  // accept without articles
+  const alts = correct.split('/').map(x => normalize(x.trim()));
+  return alts.some(a => i === a);
+}
+
+function startQuiz() {
+  quizQueue = [...WORDS].sort(() => Math.random() - 0.5);
+  quizIndex = 0; quizScore = 0; quizWrong = [];
+  showQuestion();
+}
+
+function showQuestion() {
+  quizAnswered = false;
+  const w = quizQueue[quizIndex];
+  const total = quizQueue.length;
+  document.getElementById('quiz-counter').textContent = (quizIndex+1) + ' / ' + total;
+  const pct = (quizIndex / total * 100) + '%';
+
+  document.getElementById('quiz-body').innerHTML = `
+    <div class="quiz-progress" style="width:100%;max-width:400px;">
+      <div class="quiz-progress-bar" style="width:${pct}"></div>
+    </div>
+    <div class="quiz-card">
+      <div class="quiz-label">Come si dice in inglese?</div>
+      <div class="quiz-word">${w.it}</div>
+      <div class="quiz-hint">Scrivi la parola in inglese</div>
+      <input class="quiz-input" id="quiz-input" type="text"
+        placeholder="..." autocomplete="off" autocorrect="off" spellcheck="false"
+        onkeydown="quizKey(event)"/>
+      <div class="quiz-feedback" id="quiz-feedback"></div>
+    </div>
+    <button class="quiz-btn" id="quiz-action-btn" onclick="checkAnswer()">Controlla ✓</button>
+  `;
+  setTimeout(() => {
+    const inp = document.getElementById('quiz-input');
+    if (inp) inp.focus();
+  }, 100);
+}
+
+function quizKey(e) {
+  if (e.key === 'Enter') {
+    if (!quizAnswered) checkAnswer();
+    else nextQuestion();
+  }
+}
+
+function checkAnswer() {
+  if (quizAnswered) return;
+  quizAnswered = true;
+  const w = quizQueue[quizIndex];
+  const input = document.getElementById('quiz-input');
+  const feedback = document.getElementById('quiz-feedback');
+  const btn = document.getElementById('quiz-action-btn');
+  const val = input.value.trim();
+  if (!val) return;
+
+  if (isCorrect(val, w.en)) {
+    quizScore++;
+    input.classList.add('correct');
+    feedback.className = 'quiz-feedback correct';
+    feedback.textContent = '✅ Corretto! Well done!';
+  } else {
+    input.classList.add('wrong');
+    feedback.className = 'quiz-feedback wrong';
+    feedback.innerHTML = '❌ La risposta è: <b>' + w.en + '</b>';
+    quizWrong.push(w);
+  }
+  btn.textContent = quizIndex < quizQueue.length - 1 ? 'Avanti →' : 'Risultati 🏆';
+  btn.onclick = nextQuestion;
+}
+
+function nextQuestion() {
+  quizIndex++;
+  if (quizIndex >= quizQueue.length) {
+    showResults();
+  } else {
+    showQuestion();
+  }
+}
+
+function showResults() {
+  const total = quizQueue.length;
+  const pct = Math.round(quizScore / total * 100);
+  const emoji = pct === 100 ? '🏆' : pct >= 70 ? '🌟' : pct >= 40 ? '💪' : '📚';
+  const msg = pct === 100 ? 'Perfetto!' : pct >= 70 ? 'Ottimo lavoro!' : pct >= 40 ? 'Continua così!' : 'Riprova, ci riuscirai!';
+
+  let wrongHTML = '';
+  if (quizWrong.length > 0) {
+    wrongHTML = '<div class="quiz-wrong-list"><b style="font-size:13px;color:#6b7280;">Da ripassare:</b>';
+    quizWrong.forEach(w => {
+      wrongHTML += `<div class="quiz-wrong-item">${w.it} → <b>${w.en}</b></div>`;
+    });
+    wrongHTML += '</div>';
+  }
+
+  document.getElementById('quiz-counter').textContent = '';
+  document.getElementById('quiz-body').innerHTML = `
+    <div class="quiz-score-card">
+      <div style="font-size:48px;margin-bottom:4px;">${emoji}</div>
+      <div class="quiz-score-big">${quizScore}/${total}</div>
+      <div class="quiz-score-label">${msg} (${pct}%)</div>
+      ${wrongHTML}
+    </div>
+    <button class="quiz-btn" onclick="startQuiz()">🔄 Ricomincia</button>
+    <button class="quiz-btn pink" onclick="showScreen('screen-topics-en')" style="margin-top:8px;">← Topics</button>
+  `;
+  savePracticeDay();
+}
+
+// Auto-start quiz when screen is shown
+const _origShowScreen = showScreen;
+window.showScreen = function(id) {
+  _origShowScreen(id);
+  if (id === 'screen-quiz') startQuiz();
+};
+
+// ── IRREGULAR VERBS QUIZ ──
+const IRREGULAR_VERBS = [
+  {base:"be",ps:"was/were",pp:"been"},{base:"become",ps:"became",pp:"become"},
+  {base:"begin",ps:"began",pp:"begun"},{base:"bite",ps:"bit",pp:"bitten"},
+  {base:"blow",ps:"blew",pp:"blown"},{base:"break",ps:"broke",pp:"broken"},
+  {base:"bring",ps:"brought",pp:"brought"},{base:"build",ps:"built",pp:"built"},
+  {base:"buy",ps:"bought",pp:"bought"},{base:"catch",ps:"caught",pp:"caught"},
+  {base:"choose",ps:"chose",pp:"chosen"},{base:"come",ps:"came",pp:"come"},
+  {base:"do",ps:"did",pp:"done"},{base:"draw",ps:"drew",pp:"drawn"},
+  {base:"drink",ps:"drank",pp:"drunk"},{base:"drive",ps:"drove",pp:"driven"},
+  {base:"eat",ps:"ate",pp:"eaten"},{base:"fall",ps:"fell",pp:"fallen"},
+  {base:"feel",ps:"felt",pp:"felt"},{base:"find",ps:"found",pp:"found"},
+  {base:"fly",ps:"flew",pp:"flown"},{base:"forget",ps:"forgot",pp:"forgotten"},
+  {base:"get",ps:"got",pp:"got"},{base:"give",ps:"gave",pp:"given"},
+  {base:"go",ps:"went",pp:"gone"},{base:"grow",ps:"grew",pp:"grown"},
+  {base:"have",ps:"had",pp:"had"},{base:"hear",ps:"heard",pp:"heard"},
+  {base:"know",ps:"knew",pp:"known"},{base:"leave",ps:"left",pp:"left"},
+  {base:"lose",ps:"lost",pp:"lost"},{base:"make",ps:"made",pp:"made"},
+  {base:"meet",ps:"met",pp:"met"},{base:"pay",ps:"paid",pp:"paid"},
+  {base:"read",ps:"read",pp:"read"},{base:"ride",ps:"rode",pp:"ridden"},
+  {base:"run",ps:"ran",pp:"run"},{base:"say",ps:"said",pp:"said"},
+  {base:"see",ps:"saw",pp:"seen"},{base:"sell",ps:"sold",pp:"sold"},
+  {base:"send",ps:"sent",pp:"sent"},{base:"sing",ps:"sang",pp:"sung"},
+  {base:"sit",ps:"sat",pp:"sat"},{base:"sleep",ps:"slept",pp:"slept"},
+  {base:"speak",ps:"spoke",pp:"spoken"},{base:"spend",ps:"spent",pp:"spent"},
+  {base:"stand",ps:"stood",pp:"stood"},{base:"steal",ps:"stole",pp:"stolen"},
+  {base:"swim",ps:"swam",pp:"swum"},{base:"take",ps:"took",pp:"taken"},
+  {base:"teach",ps:"taught",pp:"taught"},{base:"tell",ps:"told",pp:"told"},
+  {base:"think",ps:"thought",pp:"thought"},{base:"throw",ps:"threw",pp:"thrown"},
+  {base:"understand",ps:"understood",pp:"understood"},{base:"wake",ps:"woke",pp:"woken"},
+  {base:"wear",ps:"wore",pp:"worn"},{base:"win",ps:"won",pp:"won"},
+  {base:"write",ps:"wrote",pp:"written"},
+];
+let verbQueue=[],verbIndex=0,verbScore=0,verbWrong=[],verbAnswered=false;
+function startVerbQuiz(){verbQueue=[...IRREGULAR_VERBS].sort(()=>Math.random()-0.5).slice(0,20);verbIndex=0;verbScore=0;verbWrong=[];showVerbQuestion();}
+function showVerbQuestion(){
+  verbAnswered=false;
+  const v=verbQueue[verbIndex],total=verbQueue.length;
+  document.getElementById('verbquiz-counter').textContent=(verbIndex+1)+' / '+total;
+  const pct=(verbIndex/total*100)+'%';
+  document.getElementById('verbquiz-body').innerHTML=`
+    <div class="quiz-progress" style="width:100%;max-width:440px;"><div class="quiz-progress-bar" style="width:${pct}"></div></div>
+    <div class="quiz-card" style="max-width:440px;">
+      <div class="quiz-label">Completa le 3 forme</div>
+      <div class="verb-grid">
+        <div class="verb-col-head">Base form</div><div class="verb-col-head">Past Simple</div><div class="verb-col-head">Past Participle</div>
+        <div class="verb-base">${v.base}</div>
+        <div><input class="verb-input" id="v-ps" placeholder="..." autocomplete="off" autocorrect="off" spellcheck="false" onkeydown="verbKey(event)"/><div class="verb-answer" id="ans-ps"></div></div>
+        <div><input class="verb-input" id="v-pp" placeholder="..." autocomplete="off" autocorrect="off" spellcheck="false" onkeydown="verbKey(event)"/><div class="verb-answer" id="ans-pp"></div></div>
+      </div>
+    </div>
+    <button class="quiz-btn" id="verb-action-btn" onclick="checkVerb()">Controlla ✓</button>`;
+  setTimeout(()=>{const i=document.getElementById('v-ps');if(i)i.focus();},100);
+}
+function verbKey(e){if(e.key==='Enter'){if(!verbAnswered)checkVerb();else nextVerb();}}
+function checkVerb(){
+  if(verbAnswered)return; verbAnswered=true;
+  const v=verbQueue[verbIndex];
+  const psVal=document.getElementById('v-ps').value.trim().toLowerCase();
+  const ppVal=document.getElementById('v-pp').value.trim().toLowerCase();
+  const psOk=v.ps.split('/').map(x=>x.trim()).includes(psVal);
+  const ppOk=v.pp.split('/').map(x=>x.trim()).includes(ppVal);
+  const psEl=document.getElementById('v-ps'),ppEl=document.getElementById('v-pp');
+  const apsEl=document.getElementById('ans-ps'),appEl=document.getElementById('ans-pp');
+  if(psOk){psEl.classList.add('correct');apsEl.textContent='✅';}else{psEl.classList.add('wrong');apsEl.textContent='→ '+v.ps;apsEl.style.color='#dc2626';}
+  if(ppOk){ppEl.classList.add('correct');appEl.textContent='✅';}else{ppEl.classList.add('wrong');appEl.textContent='→ '+v.pp;appEl.style.color='#dc2626';}
+  if(psOk&&ppOk)verbScore++;else verbWrong.push(v);
+  const btn=document.getElementById('verb-action-btn');
+  btn.textContent=verbIndex<verbQueue.length-1?'Avanti →':'Risultati 🏆';btn.onclick=nextVerb;
+}
+function nextVerb(){verbIndex++;if(verbIndex>=verbQueue.length)showVerbResults();else showVerbQuestion();}
+function showVerbResults(){
+  const total=verbQueue.length,pct=Math.round(verbScore/total*100);
+  const emoji=pct===100?'🏆':pct>=70?'🌟':pct>=40?'💪':'📚';
+  const msg=pct===100?'Perfetto!':pct>=70?'Ottimo!':pct>=40?'Continua!':'Riprova!';
+  let wHTML='';
+  if(verbWrong.length>0){wHTML='<div class="quiz-wrong-list"><b style="font-size:13px;color:#6b7280;">Da ripassare:</b>';verbWrong.forEach(v=>{wHTML+=`<div class="quiz-wrong-item">${v.base} → <b>${v.ps}</b> → <b>${v.pp}</b></div>`;});wHTML+='</div>';}
+  document.getElementById('verbquiz-counter').textContent='';
+  document.getElementById('verbquiz-body').innerHTML=`<div class="quiz-score-card"><div style="font-size:48px">${emoji}</div><div class="quiz-score-big">${verbScore}/${total}</div><div class="quiz-score-label">${msg} (${pct}%)</div>${wHTML}</div><button class="quiz-btn" onclick="startVerbQuiz()">🔄 Ricomincia</button><button class="quiz-btn pink" onclick="showScreen('screen-topics-en')" style="margin-top:8px;">← Topics</button>`;
+  savePracticeDay();
+}
+
+// ── GRAMMAR EXERCISES ──
+const GRAMMAR_EX=[
+  {type:"fill",topic:"Past Simple — Regular",before:"Yesterday I",blank:"listened",after:"to music for two hours.",hint:"listen → ?"},
+  {type:"fill",topic:"Past Simple — Regular",before:"She",blank:"studied",after:"English last night.",hint:"study → ?"},
+  {type:"fill",topic:"Past Simple — Regular",before:"They",blank:"planned",after:"a trip last summer.",hint:"plan → ?"},
+  {type:"fill",topic:"Past Simple — Irregular",before:"He",blank:"went",after:"to the cinema yesterday.",hint:"go → ?"},
+  {type:"fill",topic:"Past Simple — Irregular",before:"We",blank:"ate",after:"pizza for dinner.",hint:"eat → ?"},
+  {type:"fill",topic:"Past Simple — Irregular",before:"She",blank:"wrote",after:"a letter to her friend.",hint:"write → ?"},
+  {type:"mc",topic:"Forma Negativa",question:"Scegli la forma negativa corretta di: 'He scored a goal.'",options:["He didn't scored a goal.","He didn't score a goal.","He doesn't scored a goal.","He not score a goal."],correct:1,explanation:"Negativa: soggetto + didn't + verbo BASE"},
+  {type:"mc",topic:"Forma Negativa",question:"Quale frase è corretta?",options:["They not went to school.","They didn't went to school.","They didn't go to school.","They don't go to school yesterday."],correct:2,explanation:"didn't + verbo BASE (non la forma irregolare!)"},
+  {type:"mc",topic:"Forma Negativa — be",question:"Forma negativa di 'She was at home':",options:["She wasn't at home.","She didn't was at home.","She didn't be at home.","She not was at home."],correct:0,explanation:"Be è speciale: was/were + NOT (senza did)"},
+  {type:"mc",topic:"Forma Interrogativa",question:"Come si trasforma in domanda? 'You watched TV yesterday.'",options:["Watched you TV yesterday?","Did you watched TV yesterday?","Did you watch TV yesterday?","Do you watch TV yesterday?"],correct:2,explanation:"Interrogativa: Did + soggetto + verbo BASE + ?"},
+  {type:"fill",topic:"Forma Interrogativa",before:"",blank:"Did",after:"they go to Rome? Yes, they did.",hint:"Inizia la domanda con...?"},
+  {type:"mc",topic:"Who/What come soggetto",question:"Quale frase è corretta?",options:["Who did went shopping?","Who went shopping?","Did who go shopping?","Who does went shopping?"],correct:1,explanation:"Con Who/What come soggetto NON si usa did"},
+  {type:"mc",topic:"Have to — Affermativa",question:"'Devo andare a scuola.' Come si dice?",options:["I must to go to school.","I have go to school.","I have to go to school.","I has to go to school."],correct:2,explanation:"have to + verbo BASE = obbligo esterno"},
+  {type:"mc",topic:"Have to — Negativa",question:"'Non devo alzarmi presto.' (non c'è obbligo)",options:["I mustn't get up early.","I don't have to get up early.","I hasn't to get up early.","I didn't have get up early."],correct:1,explanation:"don't have to = non c'è necessità (≠ mustn't = è vietato)"},
+  {type:"mc",topic:"Have to — Interrogativa",question:"Forma interrogativa corretta:",options:["Have you to tidy your room?","Do you have to tidy your room?","Does you have to tidy your room?","You have to tidy your room?"],correct:1,explanation:"Do/Does + soggetto + have to + verbo BASE"},
+  {type:"fill",topic:"Have to — Past",before:"Yesterday Tom",blank:"had to",after:"stay at home as a punishment.",hint:"Past di 'have to' = ?"},
+];
+let gramQueue=[],gramIndex=0,gramScore=0,gramWrong=[],gramAnswered=false;
+function startGrammarQuiz(){gramQueue=[...GRAMMAR_EX].sort(()=>Math.random()-0.5);gramIndex=0;gramScore=0;gramWrong=[];showGramQuestion();}
+function showGramQuestion(){
+  gramAnswered=false;
+  const q=gramQueue[gramIndex],total=gramQueue.length;
+  document.getElementById('grammar-counter').textContent=(gramIndex+1)+' / '+total;
+  const pct=(gramIndex/total*100)+'%';
+  let bHTML=`<div class="quiz-progress" style="width:100%;max-width:440px;"><div class="quiz-progress-bar" style="width:${pct};background:linear-gradient(90deg,#fb923c,#ea580c);"></div></div><div class="grammar-card"><div class="grammar-type">${q.topic}</div>`;
+  if(q.type==='mc'){
+    bHTML+=`<div class="grammar-question">${q.question}</div><div class="mc-options">`;
+    q.options.forEach((opt,i)=>{bHTML+=`<button class="mc-btn" id="mc-${i}" onclick="checkMC(${i})">${opt}</button>`;});
+    bHTML+=`</div>`;
+  }else{
+    bHTML+=`<div class="grammar-question">Completa la frase: <span style="color:#9ca3af;font-size:13px;">(${q.hint})</span></div><div class="fill-row" style="font-size:16px;font-weight:700;color:#1f2937;"><span>${q.before}</span><input class="fill-input" id="gram-fill" placeholder="..." autocomplete="off" autocorrect="off" spellcheck="false" onkeydown="gramKey(event)" style="width:130px;"/><span>${q.after}</span></div>`;
+  }
+  bHTML+=`<div class="grammar-feedback" id="gram-feedback"></div><div class="grammar-explanation" id="gram-explanation"></div></div><button class="quiz-btn" id="gram-action-btn" style="background:linear-gradient(135deg,#fb923c,#ea580c);box-shadow:0 4px 14px rgba(234,88,12,0.35);" onclick="${q.type==='mc'?'':'checkFill()'}">Controlla ✓</button>`;
+  document.getElementById('grammarquiz-body').innerHTML=bHTML;
+  if(q.type==='fill')setTimeout(()=>{const i=document.getElementById('gram-fill');if(i)i.focus();},100);
+}
+function gramKey(e){if(e.key==='Enter'){if(!gramAnswered)checkFill();else nextGram();}}
+function checkMC(chosen){
+  if(gramAnswered)return; gramAnswered=true;
+  const q=gramQueue[gramIndex];
+  q.options.forEach((_,i)=>{const el=document.getElementById('mc-'+i);if(i===q.correct)el.classList.add('show-correct');else if(i===chosen&&chosen!==q.correct)el.classList.add('wrong');el.disabled=true;});
+  const fb=document.getElementById('gram-feedback'),ex=document.getElementById('gram-explanation'),btn=document.getElementById('gram-action-btn');
+  if(chosen===q.correct){gramScore++;fb.className='grammar-feedback correct';fb.textContent='✅ Corretto! Well done!';}
+  else{gramWrong.push(q);fb.className='grammar-feedback wrong';fb.textContent='❌ Risposta sbagliata!';}
+  if(q.explanation)ex.textContent='💡 '+q.explanation;
+  btn.textContent=gramIndex<gramQueue.length-1?'Avanti →':'Risultati 🏆';btn.onclick=nextGram;
+}
+function checkFill(){
+  if(gramAnswered)return; gramAnswered=true;
+  const q=gramQueue[gramIndex],inp=document.getElementById('gram-fill');
+  const val=inp.value.trim().toLowerCase(),correct=q.blank.toLowerCase();
+  const alts=correct.split('/').map(x=>x.trim());
+  const fb=document.getElementById('gram-feedback'),ex=document.getElementById('gram-explanation'),btn=document.getElementById('gram-action-btn');
+  if(alts.includes(val)){gramScore++;inp.classList.add('correct');fb.className='grammar-feedback correct';fb.textContent='✅ Corretto! Well done!';}
+  else{gramWrong.push(q);inp.classList.add('wrong');fb.className='grammar-feedback wrong';fb.innerHTML='❌ Risposta: <b>'+q.blank+'</b>';}
+  if(q.explanation)ex.textContent='💡 '+q.explanation;
+  btn.textContent=gramIndex<gramQueue.length-1?'Avanti →':'Risultati 🏆';btn.onclick=nextGram;
+}
+function nextGram(){gramIndex++;if(gramIndex>=gramQueue.length)showGramResults();else showGramQuestion();}
+function showGramResults(){
+  const total=gramQueue.length,pct=Math.round(gramScore/total*100);
+  const emoji=pct===100?'🏆':pct>=70?'🌟':pct>=40?'💪':'📚';
+  const msg=pct===100?'Perfetto!':pct>=70?'Ottimo!':pct>=40?'Continua!':'Riprova!';
+  let wHTML='';
+  if(gramWrong.length>0){wHTML='<div class="quiz-wrong-list"><b style="font-size:13px;color:#6b7280;">Da ripassare:</b>';gramWrong.forEach(q=>{wHTML+=`<div class="quiz-wrong-item"><span>${q.topic}</span></div>`;});wHTML+='</div>';}
+  document.getElementById('grammar-counter').textContent='';
+  document.getElementById('grammarquiz-body').innerHTML=`<div class="quiz-score-card"><div style="font-size:48px">${emoji}</div><div class="quiz-score-big">${gramScore}/${total}</div><div class="quiz-score-label">${msg} (${pct}%)</div>${wHTML}</div><button class="quiz-btn" style="background:linear-gradient(135deg,#fb923c,#ea580c)" onclick="startGrammarQuiz()">🔄 Ricomincia</button><button class="quiz-btn pink" onclick="showScreen('screen-topics-en')" style="margin-top:8px;">← Topics</button>`;
+  savePracticeDay();
+}
+const _prevShowScreen2=window.showScreen;
+window.showScreen=function(id){_prevShowScreen2(id);if(id==='screen-verbquiz')startVerbQuiz();if(id==='screen-grammarquiz')startGrammarQuiz();};
+
+
+// ── LANGUAGE MANAGEMENT ──
+let currentLang = 'en';
+let readingFromLang = 'en';
+
+function selectLang(lang) {
+  currentLang = lang;
+  if (lang === 'en') {
+    showScreen('screen-welcome-en');
+    if (anim_welcome) anim_welcome.play();
+  } else {
+    showScreen('screen-welcome-es');
+    if (anim_welcome_es) anim_welcome_es.play();
+  }
+}
+
+function goBackFromReading() {
+  showScreen(readingFromLang === 'es' ? 'screen-topics-es' : 'screen-topics-en');
+}
+
+// load extra Lottie instances
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    const cfg2 = { renderer:'svg', loop:true, autoplay:true, animationData: LOTTIE_DATA };
+    if (document.getElementById('lottie-welcome-es'))
+      window.anim_welcome_es = lottie.loadAnimation({...cfg2, container: document.getElementById('lottie-welcome-es')});
+    if (document.getElementById('lottie-topics-es'))
+      window.anim_topics_es = lottie.loadAnimation({...cfg2, container: document.getElementById('lottie-topics-es')});
+    if (document.getElementById('lottie-chat-es'))
+      window.anim_chat_es = lottie.loadAnimation({...cfg2, container: document.getElementById('lottie-chat-es')});
+  }, 600);
+});
+
+// ── SPANISH TOPICS ──
+const TOPICS_ES = [
+  { id:"familia",  emoji:"👨‍👩‍👧", label:"Mi Familia",    bg:"#fef9ee", border:"#fcd34d", prompt:"Empieza la conversación. Di hola y pregunta: ¿cuántas personas hay en tu familia? Usa español A2 sencillo." },
+  { id:"casa",     emoji:"🏠",     label:"Mi Casa",      bg:"#eff6ff", border:"#93c5fd", prompt:"Empieza. Di hola y pregunta: ¿vives en una casa o en un piso? Usa español A2 sencillo." },
+  { id:"animales", emoji:"🐾",     label:"Animales",     bg:"#f0fdf4", border:"#86efac", prompt:"Empieza. Di hola y pregunta: ¿tienes alguna mascota? Usa español A2 sencillo." },
+  { id:"comida",   emoji:"🍕",     label:"Comida",       bg:"#fff7ed", border:"#fdba74", prompt:"Empieza. Di hola y pregunta: ¿cuál es tu comida favorita? Usa español A2 sencillo." },
+  { id:"escuela",  emoji:"🏫",     label:"El Colegio",   bg:"#fdf4ff", border:"#d8b4fe", prompt:"Empieza. Di hola y pregunta: ¿cuál es tu asignatura favorita? Usa español A2 sencillo." },
+  { id:"tiempo",   emoji:"🌤️",    label:"El Tiempo",    bg:"#ecfeff", border:"#67e8f9", prompt:"Empieza. Di hola y pregunta: ¿qué tiempo hace hoy? Usa español A2 sencillo." },
+  { id:"deporte",  emoji:"⚽",     label:"Deportes",     bg:"#f7fee7", border:"#a3e635", prompt:"Empieza. Di hola y pregunta: ¿practicas algún deporte? Usa español A2 sencillo." },
+  { id:"amigos",   emoji:"👫",     label:"Amigos",       bg:"#fefce8", border:"#fde047", prompt:"Empieza. Di hola y pregunta: háblame de tu mejor amigo/a. Usa español A2 sencillo." },
+];
+
+const gridEs = document.getElementById('topic-grid-es');
+if (gridEs) {
+  TOPICS_ES.forEach(t => {
+    const btn = document.createElement('button');
+    btn.className = 'topic-btn';
+    btn.style.background = t.bg;
+    btn.style.borderColor = t.border;
+    btn.innerHTML = `<span style="font-size:28px">${t.emoji}</span><span class="tlabel">${t.label}</span>`;
+    btn.onclick = () => startTopicEs(t);
+    gridEs.appendChild(btn);
+  });
+}
+
+// ── SPANISH SYSTEM PROMPT ──
+const SYSTEM_PROMPT_ES = `Eres Lola, una profesora de español simpática y animada para estudiantes jóvenes de nivel A2 (10-14 años).
+PERSONALIDAD: Paciente, divertida, usa palabras simples, siempre amable.
+REGLAS DE IDIOMA:
+- Solo vocabulario A2. Frases cortas (máx 12 palabras).
+- Máximo 3 frases por respuesta.
+- Haz exactamente UNA pregunta simple al final de cada respuesta.
+- Nunca digas "incorrecto" o "error". Corrige naturalmente repitiendo la forma correcta.
+- Añade siempre un ánimo: "¡Muy bien!", "¡Perfecto!", "¡Excelente!", "¡Genial!".
+- Usa 1-2 emojis por respuesta.
+REGLA DE CORRECCIÓN: Si el estudiante comete un error, añade al final: "💡 ¿Querías decir: [versión correcta]?"
+REGLA DE TEMA: Solo habla del tema elegido. Si cambia de tema: "¡Sigamos practicando español! 😊"`;
+
+let esMessages = [], esCurrentTopic = null;
+
+async function startTopicEs(t) {
+  esCurrentTopic = t; esMessages = [];
+  const col = document.getElementById('msg-col');
+  if (col) col.innerHTML = '';
+  document.getElementById('chat-title').textContent = t.emoji + ' ' + t.label;
+  currentLang = 'es';
+  showScreen('screen-chat');
+  await fetchLola([{ role:'user', content: t.prompt }]);
+}
+
+async function fetchLola(history) {
+  setLoading(true); addTyping();
+  try {
+    const res = await fetch('/api/chat', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:1000, system:SYSTEM_PROMPT_ES, messages:history })
+    });
+    const data = await res.json();
+    const text = data.content?.[0]?.text || '¿Puedes repetir? 😊';
+    removeTyping(); window.addBubble('lily', text);
+    esMessages.push({ role:'assistant', content:text });
+  } catch(e) { removeTyping(); window.addBubble('lily', '¡Ups! Algo fue mal. ¡Inténtalo de nuevo! 😊'); }
+  setLoading(false);
+}
+
+// Patch sendMsg to handle Spanish
+const _origSendMsg = window.sendMsg || sendMsg;
+window.sendMsg = async function() {
+  if (currentLang === 'es' && esCurrentTopic) {
+    const input = document.getElementById('chat-input');
+    const text = input.value.trim();
+    if (!text || loading) return;
+    input.value = '';
+    esMessages.push({ role:'user', content:text });
+    window.addBubble('user', text);
+    const history = [
+      { role:'user', content: esCurrentTopic.prompt },
+      { role:'assistant', content: esMessages[0]?.content || '' },
+      ...esMessages.slice(1),
+    ];
+    await fetchLola(history);
+  } else {
+    await sendMsg();
+  }
+};
+
+// ── READING COMPREHENSION — ENGLISH ──
+const READINGS_EN = [
+  {
+    title: "A Day at School",
+    text: `My name is Emma and I am 13 years old. I go to Greenfield Secondary School. My favourite subject is Science because we do interesting experiments. Yesterday, we made a volcano with vinegar and baking soda. It was amazing! After school, I usually do my homework for one hour. Then I have dinner with my family. We always eat together at 7 o'clock. At the weekend, I like playing tennis with my dad. I am not very good, but it is fun!`,
+    questions: [
+      { q:"How old is Emma?", options:["12","13","14","15"], correct:1 },
+      { q:"What is her favourite subject?", options:["Maths","English","Science","History"], correct:2 },
+      { q:"What did she make yesterday?", options:["A robot","A cake","A volcano","A painting"], correct:2 },
+      { q:"What does she do at the weekend?", options:["Swimming","Tennis","Football","Reading"], correct:1 },
+    ]
+  },
+  {
+    title: "My Family",
+    text: `I live in a small house with my family. There are five people in my family: my mum, my dad, my grandma, my brother Tom and me. My mum is a teacher and my dad is a doctor. Tom is eight years old and he loves video games. My grandma lives with us because she is old and we help her every day. We have a dog called Max. He is very funny and energetic. Every morning, Tom and I take Max for a walk before school. It is sometimes cold but we always enjoy it.`,
+    questions: [
+      { q:"How many people are in the family?", options:["3","4","5","6"], correct:2 },
+      { q:"What does the dad do?", options:["He is a teacher","He is a doctor","He is an engineer","He is a chef"], correct:1 },
+      { q:"Why does grandma live with them?", options:["She likes the house","She is old and needs help","She has no money","She loves Max"], correct:1 },
+      { q:"What is the dog's name?", options:["Tom","Rex","Max","Buddy"], correct:2 },
+    ]
+  },
+  {
+    title: "A Weekend Adventure",
+    text: `Last Saturday, my friend Jake and I went to the city park. We took the bus because it was too far to walk. First, we played football with some other kids we met there. Then we bought ice cream — I had chocolate and Jake had strawberry. After that, we sat by the lake and watched the ducks. It started to rain at about four o'clock, so we ran to the bus stop. We were a little wet but very happy. When I got home, my mum laughed because my hair was completely wet. It was one of the best days of the summer!`,
+    questions: [
+      { q:"How did they get to the park?", options:["By bike","By car","By bus","On foot"], correct:2 },
+      { q:"What flavour ice cream did Jake have?", options:["Chocolate","Vanilla","Strawberry","Lemon"], correct:2 },
+      { q:"What happened at four o'clock?", options:["They played football","It started to rain","They went home","They ate lunch"], correct:1 },
+      { q:"How did the narrator feel at the end?", options:["Tired and sad","Wet but happy","Angry and cold","Bored and hungry"], correct:1 },
+    ]
+  },
+];
+
+const READINGS_ES = [
+  {
+    title: "Un día en el mercado",
+    text: `El sábado por la mañana, mi madre y yo fuimos al mercado del barrio. Había muchos puestos con frutas, verduras y flores. Compramos tomates, manzanas y un poco de queso. El señor del puesto de frutas era muy simpático y nos dio una naranja gratis. También vi a mi amiga Sofía con su abuela. Tomamos un zumo de naranja en un café pequeño y charlamos un rato. Hacía mucho sol y la gente estaba muy contenta. Me gusta mucho ir al mercado porque es más divertido que ir al supermercado.`,
+    questions: [
+      { q:"¿Cuándo fueron al mercado?", options:["El viernes por la tarde","El sábado por la mañana","El domingo al mediodía","El lunes por la mañana"], correct:1 },
+      { q:"¿Qué les dio el señor del puesto gratis?", options:["Un tomate","Una manzana","Un poco de queso","Una naranja"], correct:3 },
+      { q:"¿A quién vio la narradora en el mercado?", options:["A su profesora","A su amiga Sofía","A su primo","A su vecina"], correct:1 },
+      { q:"¿Por qué le gusta el mercado?", options:["Es más barato","Es más cerca","Es más divertido","Es más grande"], correct:2 },
+    ]
+  },
+  {
+    title: "Mi rutina diaria",
+    text: `Me llamo Carlos y tengo catorce años. Vivo en Madrid con mis padres y mi hermana pequeña, Ana. Mi rutina de cada día es siempre igual. Me levanto a las siete de la mañana y desayuno cereales con leche. Luego voy al colegio en metro. Las clases empiezan a las ocho y media y terminan a las tres. Por la tarde, hago los deberes y, si tengo tiempo, juego al baloncesto con mis amigos en el parque. Me gusta mucho el baloncesto porque soy bastante alto. Por la noche, ceno con mi familia y veo la televisión un poco antes de dormir.`,
+    questions: [
+      { q:"¿Cuántos años tiene Carlos?", options:["12","13","14","15"], correct:2 },
+      { q:"¿Cómo va Carlos al colegio?", options:["En autobús","En coche","En metro","A pie"], correct:2 },
+      { q:"¿A qué hora terminan las clases?", options:["A las dos","A las tres","A las cuatro","A las dos y media"], correct:1 },
+      { q:"¿Por qué le gusta el baloncesto a Carlos?", options:["Es fácil","Sus amigos juegan","Es bastante alto","Su padre juega"], correct:2 },
+    ]
+  },
+  {
+    title: "Las vacaciones de verano",
+    text: `El verano pasado, mi familia y yo fuimos de vacaciones a la costa. Estuvimos en un hotel pequeño cerca de la playa durante una semana. Cada mañana, mis padres tomaban el sol mientras mi hermano y yo nadábamos en el mar. El agua estaba un poco fría pero nos divertimos mucho. Un día, hicimos una excursión en barco y vimos delfines. Fue increíble. También probé el pulpo por primera vez — ¡estaba delicioso! Al final de las vacaciones, no quería volver a casa. Espero volver el año que viene.`,
+    questions: [
+      { q:"¿Dónde pasó las vacaciones la familia?", options:["En las montañas","En el campo","En la ciudad","En la costa"], correct:3 },
+      { q:"¿Cuánto tiempo estuvieron de vacaciones?", options:["Tres días","Una semana","Dos semanas","Un mes"], correct:1 },
+      { q:"¿Qué vieron durante la excursión en barco?", options:["Tiburones","Ballenas","Delfines","Tortugas"], correct:2 },
+      { q:"¿Qué probó la narradora por primera vez?", options:["El pulpo","La paella","El gazpacho","Las gambas"], correct:0 },
+    ]
+  },
+];
+
+let readingData=[], readingIndex=0, readingQIndex=0, readingScore=0, readingLang='en', readingAnswered=false;
+
+function startReading(lang) {
+  readingLang=lang; readingFromLang=lang;
+  readingData = lang==='en' ? [...READINGS_EN] : [...READINGS_ES];
+  readingData.sort(()=>Math.random()-0.5);
+  readingIndex=0; readingScore=0; showReadingText();
+}
+
+function showReadingText() {
+  readingQIndex=0; readingAnswered=false;
+  const r=readingData[readingIndex], total=readingData.length;
+  const lang=readingLang, isEs=lang==='es';
+  const counterEl=document.getElementById('reading-'+lang+'-counter');
+  if(counterEl) counterEl.textContent=(readingIndex+1)+' / '+total;
+  const bodyEl=document.getElementById('reading-'+lang+'-body');
+  bodyEl.innerHTML=`
+    <div class="reading-card ${isEs?'es':''}">
+      <div class="reading-title ${isEs?'es':''}">${r.title}</div>
+      <div class="reading-meta">${isEs?'Texto':'Text'} ${readingIndex+1}/${total}</div>
+      <div class="reading-text">${r.text}</div>
+    </div>
+    <button class="quiz-btn" style="background:${isEs?'linear-gradient(135deg,#f59e0b,#d97706)':'linear-gradient(135deg,#60a5fa,#2563eb)'};" onclick="showReadingQuestion()">
+      ${isEs?'Responder preguntas →':'Answer questions →'}
+    </button>`;
+}
+
+function showReadingQuestion() {
+  readingAnswered=false;
+  const r=readingData[readingIndex], q=r.questions[readingQIndex];
+  const lang=readingLang, isEs=lang==='es', total=r.questions.length;
+  const bodyEl=document.getElementById('reading-'+lang+'-body');
+  bodyEl.innerHTML=`
+    <div class="reading-card ${isEs?'es':''}">
+      <div class="reading-title ${isEs?'es':''}">${r.title}</div>
+      <div class="reading-progress">${isEs?'Pregunta':'Question'} ${readingQIndex+1}/${total}</div>
+      <div class="reading-question">${q.q}</div>
+      <div class="mc-options">
+        ${q.options.map((opt,i)=>`<button class="mc-btn" id="rmc-${i}" onclick="checkReadingMC(${i})">${opt}</button>`).join('')}
+      </div>
+      <div class="grammar-feedback" id="r-feedback"></div>
+    </div>`;
+}
+
+function checkReadingMC(chosen) {
+  if(readingAnswered) return; readingAnswered=true;
+  const r=readingData[readingIndex], q=r.questions[readingQIndex];
+  const lang=readingLang, isEs=lang==='es';
+  q.options.forEach((_,i)=>{
+    const el=document.getElementById('rmc-'+i);
+    if(i===q.correct) el.classList.add('show-correct');
+    else if(i===chosen&&chosen!==q.correct) el.classList.add('wrong');
+    el.disabled=true;
+  });
+  const fb=document.getElementById('r-feedback');
+  if(chosen===q.correct){ readingScore++; fb.className='grammar-feedback correct'; fb.textContent=isEs?'✅ ¡Correcto!':'✅ Correct!'; }
+  else { fb.className='grammar-feedback wrong'; fb.textContent=isEs?('❌ '+q.options[q.correct]):('❌ '+q.options[q.correct]); }
+  const bodyEl=document.getElementById('reading-'+lang+'-body');
+  const nextBtn=document.createElement('button');
+  nextBtn.className='quiz-btn';
+  nextBtn.style.background=isEs?'linear-gradient(135deg,#f59e0b,#d97706)':'linear-gradient(135deg,#60a5fa,#2563eb)';
+  nextBtn.style.marginTop='12px';
+  const isLastQ=readingQIndex>=r.questions.length-1;
+  const isLastT=readingIndex>=readingData.length-1;
+  nextBtn.textContent=isLastQ?(isLastT?(isEs?'Resultados 🏆':'Results 🏆'):(isEs?'Siguiente texto →':'Next text →')):(isEs?'Siguiente pregunta →':'Next question →');
+  nextBtn.onclick=()=>{ if(isLastQ){if(isLastT)showReadingResults();else{readingIndex++;showReadingText();}}else{readingQIndex++;readingAnswered=false;showReadingQuestion();} };
+  bodyEl.appendChild(nextBtn);
+}
+
+function showReadingResults() {
+  const lang=readingLang, isEs=lang==='es';
+  const total=readingData.reduce((s,r)=>s+r.questions.length,0);
+  const pct=Math.round(readingScore/total*100);
+  const emoji=pct===100?'🏆':pct>=70?'🌟':pct>=40?'💪':'📚';
+  document.getElementById('reading-'+lang+'-counter').textContent='';
+  document.getElementById('reading-'+lang+'-body').innerHTML=`
+    <div class="quiz-score-card">
+      <div style="font-size:48px">${emoji}</div>
+      <div class="quiz-score-big">${readingScore}/${total}</div>
+      <div class="quiz-score-label">${pct>=70?(isEs?'¡Muy bien!':'Great job!'):(isEs?'¡Sigue practicando!':'Keep practising!')} (${pct}%)</div>
+    </div>
+    <button class="quiz-btn" style="background:${isEs?'linear-gradient(135deg,#f59e0b,#d97706)':'linear-gradient(135deg,#60a5fa,#2563eb)'};" onclick="startReading('${lang}')">🔄 ${isEs?'Reiniciar':'Restart'}</button>
+    <button class="quiz-btn pink" onclick="showScreen('${isEs?'screen-topics-es':'screen-topics-en'}')" style="margin-top:8px;">← ${isEs?'Temas':'Topics'}</button>`;
+  savePracticeDay();
+}
+
+// ── SPANISH VOCABULARY QUIZ ──
+const WORDS_ES = [
+  {es:"el cuarto de baño", en:"el cuarto de baño", hint:"bathroom"},
+  {es:"la cocina",        hint:"kitchen"},
+  {es:"el salón",         hint:"living room"},
+  {es:"el dormitorio",    hint:"bedroom"},
+  {es:"limpiar",          hint:"to clean"},
+  {es:"barrer",           hint:"to sweep"},
+  {es:"fregar los platos",hint:"to wash up"},
+  {es:"hacer la cama",    hint:"to make the bed"},
+  {es:"pasar la aspiradora", hint:"to vacuum"},
+  {es:"poner la mesa",    hint:"to set the table"},
+  {es:"sacar la basura",  hint:"to take out the rubbish"},
+  {es:"planchar",         hint:"to iron"},
+  {es:"lavar la ropa",    hint:"to do the washing"},
+  {es:"ordenar",          hint:"to tidy up"},
+  {es:"cocinar",          hint:"to cook"},
+  {es:"el cubo de basura",hint:"bin"},
+  {es:"la escoba",        hint:"broom"},
+  {es:"el fregadero",     hint:"sink"},
+  {es:"la lavadora",      hint:"washing machine"},
+  {es:"el lavavajillas",  hint:"dishwasher"},
+];
+
+// For Spanish vocab: show Spanish word, student writes the English hint
+let vocabEsQueue=[],vocabEsIndex=0,vocabEsScore=0,vocabEsWrong=[],vocabEsAnswered=false;
+
+function startVocabEs(){
+  vocabEsQueue=[...WORDS_ES].sort(()=>Math.random()-0.5);
+  vocabEsIndex=0;vocabEsScore=0;vocabEsWrong=[];showVocabEsQuestion();
+}
+
+function showVocabEsQuestion(){
+  vocabEsAnswered=false;
+  const w=vocabEsQueue[vocabEsIndex],total=vocabEsQueue.length;
+  document.getElementById('vocabes-counter').textContent=(vocabEsIndex+1)+' / '+total;
+  const pct=(vocabEsIndex/total*100)+'%';
+  document.getElementById('vocabes-body').innerHTML=`
+    <div class="quiz-progress" style="width:100%;max-width:400px;"><div class="quiz-progress-bar" style="width:${pct};background:linear-gradient(90deg,#f59e0b,#d97706);"></div></div>
+    <div class="quiz-card" style="border-color:#fcd34d;">
+      <div class="quiz-label" style="color:#d97706;">¿Cómo se dice en inglés?</div>
+      <div class="quiz-word" style="color:#92400e;">${w.es}</div>
+      <div class="quiz-hint">Escribe la traducción en inglés</div>
+      <input class="quiz-input" id="vocabes-input" type="text" placeholder="..." autocomplete="off" autocorrect="off" spellcheck="false" onkeydown="vocabEsKey(event)" style="border-color:#fcd34d;"/>
+      <div class="quiz-feedback" id="vocabes-feedback"></div>
+    </div>
+    <button class="quiz-btn" id="vocabes-btn" onclick="checkVocabEs()" style="background:linear-gradient(135deg,#f59e0b,#d97706);box-shadow:0 4px 14px rgba(217,119,6,0.35);">Comprobar ✓</button>`;
+  setTimeout(()=>{const i=document.getElementById('vocabes-input');if(i)i.focus();},100);
+}
+
+function vocabEsKey(e){if(e.key==='Enter'){if(!vocabEsAnswered)checkVocabEs();else nextVocabEs();}}
+
+function checkVocabEs(){
+  if(vocabEsAnswered)return; vocabEsAnswered=true;
+  const w=vocabEsQueue[vocabEsIndex];
+  const val=document.getElementById('vocabes-input').value.trim().toLowerCase();
+  const correct=w.hint.toLowerCase();
+  const alts=correct.split('/').map(x=>x.trim().replace(/^(to |the )/,''));
+  const valClean=val.replace(/^(to |the )/,'');
+  const ok=alts.includes(valClean)||correct===val;
+  const inp=document.getElementById('vocabes-input'),fb=document.getElementById('vocabes-feedback'),btn=document.getElementById('vocabes-btn');
+  if(ok){vocabEsScore++;inp.classList.add('correct');fb.className='quiz-feedback correct';fb.textContent='✅ ¡Correcto!';}
+  else{vocabEsWrong.push(w);inp.classList.add('wrong');fb.className='quiz-feedback wrong';fb.innerHTML='❌ La respuesta es: <b>'+w.hint+'</b>';}
+  btn.textContent=vocabEsIndex<vocabEsQueue.length-1?'Siguiente →':'Resultados 🏆';btn.onclick=nextVocabEs;
+}
+
+function nextVocabEs(){vocabEsIndex++;if(vocabEsIndex>=vocabEsQueue.length)showVocabEsResults();else showVocabEsQuestion();}
+
+function showVocabEsResults(){
+  const total=vocabEsQueue.length,pct=Math.round(vocabEsScore/total*100);
+  const emoji=pct===100?'🏆':pct>=70?'🌟':pct>=40?'💪':'📚';
+  let wHTML='';
+  if(vocabEsWrong.length>0){wHTML='<div class="quiz-wrong-list"><b style="font-size:13px;color:#6b7280;">Para repasar:</b>';vocabEsWrong.forEach(w=>{wHTML+=`<div class="quiz-wrong-item">${w.es} → <b>${w.hint}</b></div>`;});wHTML+='</div>';}
+  document.getElementById('vocabes-counter').textContent='';
+  document.getElementById('vocabes-body').innerHTML=`<div class="quiz-score-card"><div style="font-size:48px">${emoji}</div><div class="quiz-score-big">${vocabEsScore}/${total}</div><div class="quiz-score-label">${pct>=70?'¡Muy bien!':'¡Sigue practicando!'} (${pct}%)</div>${wHTML}</div><button class="quiz-btn" style="background:linear-gradient(135deg,#f59e0b,#d97706)" onclick="startVocabEs()">🔄 Reiniciar</button><button class="quiz-btn pink" onclick="showScreen('screen-topics-es')" style="margin-top:8px;">← Temas</button>`;
+  savePracticeDay();
+}
+
+// ── SPANISH GRAMMAR QUIZ ──
+const GRAMMAR_ES=[
+  {type:"mc",topic:"Presente — ser/estar",question:"¿Cuál es correcto? 'Yo ___ estudiante.'",options:["estoy","soy","tengo","hay"],correct:1,explanation:"SER = identidad permanente (profesión, nacionalidad)"},
+  {type:"mc",topic:"Presente — ser/estar",question:"'Ella ___ cansada hoy.' ¿Qué verbo?",options:["es","tiene","está","hay"],correct:2,explanation:"ESTAR = estado temporal o emoción"},
+  {type:"mc",topic:"Presente — tener",question:"'Nosotros ___ un perro muy grande.'",options:["somos","estamos","tenemos","hay"],correct:2,explanation:"TENER = posesión"},
+  {type:"fill",topic:"Presente — regular -ar",before:"Yo",blank:"hablo",after:"español todos los días.",hint:"hablar → yo ?"},
+  {type:"fill",topic:"Presente — regular -er",before:"Ella",blank:"come",after:"pizza los viernes.",hint:"comer → ella ?"},
+  {type:"fill",topic:"Presente — irregular ir",before:"¿Adónde",blank:"vas",after:"tú esta tarde?",hint:"ir → tú ?"},
+  {type:"mc",topic:"Pretérito Indefinido",question:"'Ayer yo ___ al colegio en autobús.'",options:["voy","fui","iba","he ido"],correct:1,explanation:"Pretérito indefinido = acción pasada completa"},
+  {type:"mc",topic:"Pretérito Indefinido — irregular",question:"'El año pasado nosotros ___ a Madrid.'",options:["vamos","fuimos","íbamos","hemos ido"],correct:1,explanation:"ir → fui, fuiste, fue, fuimos, fuisteis, fueron"},
+  {type:"fill",topic:"Pretérito Indefinido — regular",before:"Ella",blank:"comió",after:"una pizza anoche.",hint:"comer → ella (pasado)"},
+  {type:"mc",topic:"Interrogativos",question:"'___ es tu asignatura favorita?'",options:["Quién","Cuándo","Cuál","Cómo"],correct:2,explanation:"CUÁL = which (para elegir entre opciones)"},
+  {type:"mc",topic:"Interrogativos",question:"'___ vives tú?'",options:["Qué","Dónde","Cuándo","Cómo"],correct:1,explanation:"DÓNDE = where"},
+  {type:"mc",topic:"Negación",question:"Forma negativa de 'Yo como carne.'",options:["Yo no como carne.","Yo nunca como carne.","Yo no comer carne.","Yo no comgo carne."],correct:0,explanation:"NO va siempre antes del verbo"},
+  {type:"fill",topic:"Gustar",before:"A mí me",blank:"gusta",after:"mucho la música.",hint:"gustar → singular"},
+  {type:"mc",topic:"Gustar",question:"'A ellos ___ los deportes.'",options:["gusta","gustan","gusto","gustas"],correct:1,explanation:"GUSTAN porque 'los deportes' es plural"},
+  {type:"mc",topic:"Hay / Está",question:"'___ un mercado cerca de mi casa.'",options:["Está","Es","Hay","Tiene"],correct:2,explanation:"HAY = existe/hay (existencia). ESTÁ = dónde está (ubicación)"},
+];
+
+let gramEsQueue=[],gramEsIndex=0,gramEsScore=0,gramEsWrong=[],gramEsAnswered=false;
+function startGrammarEs(){gramEsQueue=[...GRAMMAR_ES].sort(()=>Math.random()-0.5);gramEsIndex=0;gramEsScore=0;gramEsWrong=[];showGramEsQuestion();}
+function showGramEsQuestion(){
+  gramEsAnswered=false;
+  const q=gramEsQueue[gramEsIndex],total=gramEsQueue.length;
+  document.getElementById('grames-counter').textContent=(gramEsIndex+1)+' / '+total;
+  const pct=(gramEsIndex/total*100)+'%';
+  let bHTML=`<div class="quiz-progress" style="width:100%;max-width:440px;"><div class="quiz-progress-bar" style="width:${pct};background:linear-gradient(90deg,#f59e0b,#d97706);"></div></div><div class="grammar-card" style="border-color:#fcd34d;"><div class="grammar-type" style="color:#d97706;">${q.topic}</div>`;
+  if(q.type==='mc'){
+    bHTML+=`<div class="grammar-question">${q.question}</div><div class="mc-options">`;
+    q.options.forEach((opt,i)=>{bHTML+=`<button class="mc-btn" id="gmes-${i}" onclick="checkGramEs(${i})" style="border-color:#fcd34d;">${opt}</button>`;});
+    bHTML+=`</div>`;
+  }else{
+    bHTML+=`<div class="grammar-question">Completa: <span style="color:#9ca3af;font-size:13px;">(${q.hint})</span></div><div class="fill-row" style="font-size:16px;font-weight:700;color:#451a03;"><span>${q.before}</span><input class="fill-input" id="gmes-fill" placeholder="..." autocomplete="off" autocorrect="off" spellcheck="false" onkeydown="gramEsKey(event)" style="width:130px;border-color:#fcd34d;"/><span>${q.after}</span></div>`;
+  }
+  bHTML+=`<div class="grammar-feedback" id="gmes-feedback"></div><div class="grammar-explanation" id="gmes-explanation"></div></div><button class="quiz-btn" id="gmes-btn" style="background:linear-gradient(135deg,#f59e0b,#d97706);box-shadow:0 4px 14px rgba(217,119,6,0.35);" onclick="${q.type==='mc'?'':'checkGramEsFill()'}">Comprobar ✓</button>`;
+  document.getElementById('grames-body').innerHTML=bHTML;
+  if(q.type==='fill')setTimeout(()=>{const i=document.getElementById('gmes-fill');if(i)i.focus();},100);
+}
+function gramEsKey(e){if(e.key==='Enter'){if(!gramEsAnswered)checkGramEsFill();else nextGramEs();}}
+function checkGramEs(chosen){
+  if(gramEsAnswered)return; gramEsAnswered=true;
+  const q=gramEsQueue[gramEsIndex];
+  q.options.forEach((_,i)=>{const el=document.getElementById('gmes-'+i);if(i===q.correct)el.classList.add('show-correct');else if(i===chosen&&chosen!==q.correct)el.classList.add('wrong');el.disabled=true;});
+  const fb=document.getElementById('gmes-feedback'),ex=document.getElementById('gmes-explanation'),btn=document.getElementById('gmes-btn');
+  if(chosen===q.correct){gramEsScore++;fb.className='grammar-feedback correct';fb.textContent='✅ ¡Correcto!';}
+  else{gramEsWrong.push(q);fb.className='grammar-feedback wrong';fb.textContent='❌ ¡Respuesta incorrecta!';}
+  if(q.explanation)ex.textContent='💡 '+q.explanation;
+  btn.textContent=gramEsIndex<gramEsQueue.length-1?'Siguiente →':'Resultados 🏆';btn.onclick=nextGramEs;
+}
+function checkGramEsFill(){
+  if(gramEsAnswered)return; gramEsAnswered=true;
+  const q=gramEsQueue[gramEsIndex],inp=document.getElementById('gmes-fill');
+  const val=inp.value.trim().toLowerCase(),correct=q.blank.toLowerCase();
+  const ok=correct.split('/').map(x=>x.trim()).includes(val);
+  const fb=document.getElementById('gmes-feedback'),ex=document.getElementById('gmes-explanation'),btn=document.getElementById('gmes-btn');
+  if(ok){gramEsScore++;inp.classList.add('correct');fb.className='grammar-feedback correct';fb.textContent='✅ ¡Correcto!';}
+  else{gramEsWrong.push(q);inp.classList.add('wrong');fb.className='grammar-feedback wrong';fb.innerHTML='❌ Respuesta: <b>'+q.blank+'</b>';}
+  if(q.explanation)ex.textContent='💡 '+q.explanation;
+  btn.textContent=gramEsIndex<gramEsQueue.length-1?'Siguiente →':'Resultados 🏆';btn.onclick=nextGramEs;
+}
+function nextGramEs(){gramEsIndex++;if(gramEsIndex>=gramEsQueue.length)showGramEsResults();else showGramEsQuestion();}
+function showGramEsResults(){
+  const total=gramEsQueue.length,pct=Math.round(gramEsScore/total*100);
+  const emoji=pct===100?'🏆':pct>=70?'🌟':pct>=40?'💪':'📚';
+  let wHTML='';
+  if(gramEsWrong.length>0){wHTML='<div class="quiz-wrong-list"><b style="font-size:13px;color:#6b7280;">Para repasar:</b>';gramEsWrong.forEach(q=>{wHTML+=`<div class="quiz-wrong-item"><span>${q.topic}</span></div>`;});wHTML+='</div>';}
+  document.getElementById('grames-counter').textContent='';
+  document.getElementById('grames-body').innerHTML=`<div class="quiz-score-card"><div style="font-size:48px">${emoji}</div><div class="quiz-score-big">${gramEsScore}/${total}</div><div class="quiz-score-label">${pct>=70?'¡Muy bien!':'¡Sigue practicando!'} (${pct}%)</div>${wHTML}</div><button class="quiz-btn" style="background:linear-gradient(135deg,#f59e0b,#d97706)" onclick="startGrammarEs()">🔄 Reiniciar</button><button class="quiz-btn pink" onclick="showScreen('screen-topics-es')" style="margin-top:8px;">← Temas</button>`;
+  savePracticeDay();
+}
+
+// Hook showScreen for new screens
+const _prevShowScreen3=window.showScreen;
+window.showScreen=function(id){
+  _prevShowScreen3(id);
+  if(id==='screen-reading-en'){readingFromLang='en';startReading('en');}
+  if(id==='screen-reading-es'){readingFromLang='es';startReading('es');}
+  if(id==='screen-vocabquiz-es') startVocabEs();
+  if(id==='screen-grammarquiz-es') startGrammarEs();
+};
+
+// ══ VERIFICA 2 — Have to / Must / Like+ing ══
+
+// ── EXERCISE POOL ──
+// Each exercise: { type, instruction, before, blank, after, answer, answers[], rule, example }
+// type: "fill" = write blank; "transform" = rewrite full sentence; "short" = short answer
+
+const V2_POOL = [
+
+  // ─── HAVE TO — AFFIRMATIVE ───────────────────────────────
+  {type:"fill", topic:"have to — Affirmative",
+   instruction:"Complete with <b>have to</b> or <b>has to</b>.",
+   before:"She", blank:"has to", after:"tidy her room every day.",
+   rule:"HAVE TO: I/you/we/they → <b>have to</b> &nbsp;|&nbsp; he/she/it → <b>has to</b>",
+   example:"He has to do his homework. &nbsp;/&nbsp; We have to be quiet."},
+
+  {type:"fill", topic:"have to — Affirmative",
+   instruction:"Complete with <b>have to</b> or <b>has to</b>.",
+   before:"We", blank:"have to", after:"wear a uniform at school.",
+   rule:"HAVE TO: I/you/we/they → <b>have to</b> &nbsp;|&nbsp; he/she/it → <b>has to</b>",
+   example:"She has to wake up early. &nbsp;/&nbsp; They have to study."},
+
+  {type:"fill", topic:"have to — Affirmative",
+   instruction:"Complete with <b>have to</b> or <b>has to</b>.",
+   before:"My dad", blank:"has to", after:"work on Saturdays.",
+   rule:"HAVE TO: he/she/it → <b>has to</b> &nbsp;|&nbsp; I/you/we/they → <b>have to</b>",
+   example:"My mum has to cook dinner. &nbsp;/&nbsp; I have to go now."},
+
+  {type:"fill", topic:"have to — Affirmative",
+   instruction:"Complete with <b>have to</b> or <b>has to</b>.",
+   before:"I", blank:"have to", after:"do the washing-up tonight.",
+   rule:"HAVE TO: I/you/we/they → <b>have to</b> &nbsp;|&nbsp; he/she/it → <b>has to</b>",
+   example:"You have to finish your dinner."},
+
+  {type:"fill", topic:"have to — Affirmative",
+   instruction:"Complete with <b>have to</b> or <b>has to</b>.",
+   before:"It", blank:"has to", after:"be done before dinner.",
+   rule:"HAVE TO: it → <b>has to</b> (third person singular)",
+   example:"It has to be perfect."},
+
+  // ─── HAVE TO — NEGATIVE ──────────────────────────────────
+  {type:"fill", topic:"have to — Negative",
+   instruction:"Complete with <b>don't have to</b> or <b>doesn't have to</b>.",
+   before:"You", blank:"don't have to", after:"do the ironing. Mum will do it.",
+   rule:"NEGATIVE: I/you/we/they → <b>don't have to</b> &nbsp;|&nbsp; he/she/it → <b>doesn't have to</b><br>don't/doesn't have to = non c'è obbligo (non è necessario)",
+   example:"We don't have to go to school on Sunday."},
+
+  {type:"fill", topic:"have to — Negative",
+   instruction:"Complete with <b>don't have to</b> or <b>doesn't have to</b>.",
+   before:"She", blank:"doesn't have to", after:"cook dinner tonight. Dad will do it.",
+   rule:"NEGATIVE: he/she/it → <b>doesn't have to</b><br>Non c'è obbligo — it is NOT necessary.",
+   example:"She doesn't have to wake up early on Sundays."},
+
+  {type:"fill", topic:"have to — Negative",
+   instruction:"Complete with <b>don't have to</b> or <b>doesn't have to</b>.",
+   before:"They", blank:"don't have to", after:"pay for the food. It's free!",
+   rule:"NEGATIVE: they → <b>don't have to</b> (not necessary, no obligation)",
+   example:"They don't have to study tonight."},
+
+  {type:"fill", topic:"have to — Negative",
+   instruction:"Complete with <b>don't have to</b> or <b>doesn't have to</b>.",
+   before:"He", blank:"doesn't have to", after:"take the bus. He walks to school.",
+   rule:"NEGATIVE: he → <b>doesn't have to</b> &nbsp;|&nbsp; Attenzione: doesn't + have to (NOT 'hasn't to'!)",
+   example:"He doesn't have to go to the dentist today."},
+
+  {type:"fill", topic:"have to — Negative",
+   instruction:"Complete with <b>don't have to</b> or <b>doesn't have to</b>.",
+   before:"We", blank:"don't have to", after:"be at school before 8.30.",
+   rule:"NEGATIVE: we → <b>don't have to</b>. Non c'è obbligo.",
+   example:"We don't have to wear a uniform at the weekend."},
+
+  // ─── HAVE TO — INTERROGATIVE ─────────────────────────────
+  {type:"fill", topic:"have to — Interrogative",
+   instruction:"Write the correct question word: <b>Do</b> or <b>Does</b>.",
+   before:"", blank:"Does", after:"she have to tidy her room today?",
+   rule:"INTERROGATIVE: <b>Do</b> I/you/we/they…? &nbsp;|&nbsp; <b>Does</b> he/she/it…?<br>Formula: Do/Does + subject + <b>have to</b> + verb base",
+   example:"Does he have to do his homework? &nbsp;/&nbsp; Do you have to go?"},
+
+  {type:"fill", topic:"have to — Interrogative",
+   instruction:"Write the correct question word: <b>Do</b> or <b>Does</b>.",
+   before:"", blank:"Do", after:"they have to pay for the tickets?",
+   rule:"INTERROGATIVE: <b>Do</b> I/you/we/they + have to + verb?<br>Do/Does + subject + have to + base verb + ?",
+   example:"Do we have to bring our books?"},
+
+  {type:"fill", topic:"have to — Interrogative",
+   instruction:"Write the correct question word: <b>Do</b> or <b>Does</b>.",
+   before:"", blank:"Does", after:"your brother have to walk to school?",
+   rule:"INTERROGATIVE: <b>Does</b> he/she/it + have to + verb?<br>Attenzione: il verbo dopo 'have to' è sempre alla forma BASE.",
+   example:"Does your mum have to work today?"},
+
+  {type:"transform", topic:"have to — Interrogative",
+   instruction:"Turn this sentence into a question.",
+   before:"You have to do the washing-up.",
+   blank:"Do you have to do the washing-up?",
+   after:"",
+   rule:"INTERROGATIVE: sposta Do/Does all'inizio.<br>Do + subject + have to + base verb + ?",
+   example:"She has to tidy → Does she have to tidy?"},
+
+  {type:"transform", topic:"have to — Interrogative",
+   instruction:"Turn this sentence into a question.",
+   before:"He has to feed the dog.",
+   blank:"Does he have to feed the dog?",
+   after:"",
+   rule:"INTERROGATIVE: He has to → <b>Does he have to</b>…?<br>Does + subject + have to + base verb + ?",
+   example:"We have to leave → Do we have to leave?"},
+
+  // ─── HAVE TO — SHORT ANSWERS ─────────────────────────────
+  {type:"fill", topic:"have to — Short answers",
+   instruction:"Write the short answer (affirmative).",
+   before:"Does she have to clean the bathroom? →", blank:"Yes, she does.", after:"",
+   rule:"SHORT ANSWERS: Yes, + pronoun + <b>do/does</b>.<br>Yes, I do. / Yes, she does. / Yes, they do.",
+   example:"Do you have to go? Yes, I do."},
+
+  {type:"fill", topic:"have to — Short answers",
+   instruction:"Write the short answer (negative).",
+   before:"Do they have to pay? →", blank:"No, they don't.", after:"",
+   rule:"SHORT ANSWERS: No, + pronoun + <b>don't/doesn't</b>.<br>No, I don't. / No, he doesn't. / No, we don't.",
+   example:"Does he have to study? No, he doesn't."},
+
+  {type:"fill", topic:"have to — Short answers",
+   instruction:"Write the short answer (affirmative).",
+   before:"Do you have to tidy your room? →", blank:"Yes, I do.", after:"",
+   rule:"SHORT ANSWERS: Yes, + pronoun + do.<br>Yes, I do. / Yes, you do. / Yes, we do.",
+   example:"Do you have to help? Yes, I do."},
+
+  {type:"fill", topic:"have to — Short answers",
+   instruction:"Write the short answer (negative).",
+   before:"Does he have to wear a uniform? →", blank:"No, he doesn't.", after:"",
+   rule:"SHORT ANSWERS: No, + pronoun + doesn't.<br>Attenzione: non 'No, he don't!'",
+   example:"Does she have to cook? No, she doesn't."},
+
+  {type:"fill", topic:"have to — Short answers",
+   instruction:"Write the short answer (affirmative).",
+   before:"Does your mum have to work today? →", blank:"Yes, she does.", after:"",
+   rule:"SHORT ANSWERS: Yes, she does. (he/she/it → does)",
+   example:"Does he have to go? Yes, he does."},
+
+  // ─── MUST ────────────────────────────────────────────────
+  {type:"fill", topic:"must",
+   instruction:"Complete with <b>must</b>.",
+   before:"You", blank:"must", after:"be quiet in the library.",
+   rule:"MUST: uguale per tutte le persone (I/you/he/she/it/we/they <b>must</b>).<br>Must = obbligo forte / regola importante.",
+   example:"You must do your homework. &nbsp;/&nbsp; She must be careful."},
+
+  {type:"fill", topic:"must",
+   instruction:"Complete with <b>must</b>.",
+   before:"Students", blank:"must", after:"turn off their phones in class.",
+   rule:"MUST: same form for all persons. No 's' in third person!<br>He must (NOT 'he musts'). Esprime obbligo o necessità.",
+   example:"Everyone must follow the rules."},
+
+  {type:"fill", topic:"must",
+   instruction:"Complete with <b>must</b>.",
+   before:"I", blank:"must", after:"remember to bring my PE kit tomorrow.",
+   rule:"MUST = obbligo che senti tu stesso (interno).<br>HAVE TO = obbligo esterno (regola, altra persona).",
+   example:"I must call my grandma today."},
+
+  {type:"fill", topic:"must",
+   instruction:"Complete with <b>must</b> or <b>have to</b>. The rule comes from school.",
+   before:"We", blank:"have to", after:"wear a uniform at our school.",
+   rule:"HAVE TO = obbligo esterno (regola di scuola, legge).<br>MUST = obbligo personale/morale.",
+   example:"We have to be at school by 8.30. &nbsp;/&nbsp; I must study more."},
+
+  {type:"fill", topic:"must",
+   instruction:"Complete with <b>mustn't</b>.",
+   before:"You", blank:"mustn't", after:"use your phone during the test.",
+   rule:"MUSTN'T = è vietato, non devi assolutamente!<br>Attenzione: mustn't ≠ don't have to.<br>mustn't = proibizione / don't have to = non necessario.",
+   example:"You mustn't run in the corridors."},
+
+  // ─── LIKE + ING ──────────────────────────────────────────
+  {type:"fill", topic:"like + -ing",
+   instruction:"Complete with the correct <b>-ing</b> form.",
+   before:"She likes", blank:"dancing", after:"at weekends.",
+   rule:"LIKE + -ing: dopo 'like/likes' si usa il verbo con <b>-ing</b>.<br>dance → danc<b>ing</b> (rimuovi la -e finale prima di aggiungere -ing)",
+   example:"I like swimming. &nbsp;/&nbsp; She likes reading."},
+
+  {type:"fill", topic:"like + -ing",
+   instruction:"Complete with the correct <b>-ing</b> form.",
+   before:"I love", blank:"swimming", after:"in the sea.",
+   rule:"LIKE/LOVE/HATE/ENJOY + -ing.<br>swim → swim<b>ming</b> (consonante finale raddoppiata!)",
+   example:"He loves swimming. &nbsp;/&nbsp; We hate getting up early."},
+
+  {type:"fill", topic:"like + -ing",
+   instruction:"Complete with the correct <b>-ing</b> form.",
+   before:"They enjoy", blank:"playing", after:"video games after school.",
+   rule:"ENJOY + -ing: dopo enjoy sempre la forma -ing.<br>play → play<b>ing</b> (aggiungi solo -ing)",
+   example:"They enjoy playing football. &nbsp;/&nbsp; She enjoys cooking."},
+
+  {type:"fill", topic:"like + -ing",
+   instruction:"Complete with the correct <b>-ing</b> form.",
+   before:"My brother hates", blank:"tidying", after:"his room.",
+   rule:"HATE + -ing: dopo hate sempre -ing.<br>tidy → tidy<b>ing</b> (aggiungi solo -ing, la -y rimane!)",
+   example:"He hates doing homework. &nbsp;/&nbsp; I hate waking up late."},
+
+  {type:"fill", topic:"like + -ing",
+   instruction:"Complete with the correct <b>-ing</b> form.",
+   before:"My sister doesn't like", blank:"making", after:"her bed.",
+   rule:"LIKE + -ing: make → mak<b>ing</b> (rimuovi -e finale).<br>Verbi che finiscono in -e: rimuovi -e, aggiungi -ing.",
+   example:"She likes making pizza. &nbsp;/&nbsp; He likes riding his bike."},
+
+  {type:"fill", topic:"like + -ing",
+   instruction:"Complete with the correct <b>-ing</b> form.",
+   before:"We don't mind", blank:"helping", after:"at home.",
+   rule:"DON'T MIND + -ing: help → help<b>ing</b>.<br>Aggiungi semplicemente -ing ai verbi che non finiscono in -e.",
+   example:"I don't mind walking to school."},
+
+  {type:"fill", topic:"like + -ing",
+   instruction:"Complete with the correct <b>-ing</b> form.",
+   before:"Do you like", blank:"running", after:"in the park?",
+   rule:"LIKE + -ing: run → run<b>ning</b> (consonante CVC → raddoppia la consonante finale!)<br>run → runn<b>ing</b> | swim → swimm<b>ing</b> | sit → sitt<b>ing</b>",
+   example:"She likes running. &nbsp;/&nbsp; Do you like swimming?"},
+
+  {type:"fill", topic:"like + -ing",
+   instruction:"Complete with the correct <b>-ing</b> form.",
+   before:"Josh loves", blank:"watching", after:"sci-fi films.",
+   rule:"LOVE + -ing: watch → watch<b>ing</b>.<br>Aggiungi -ing ai verbi che finiscono in consonante normale.",
+   example:"He loves watching TV. &nbsp;/&nbsp; She loves reading."},
+
+  {type:"fill", topic:"like + -ing",
+   instruction:"Write the full sentence using like + -ing.",
+   before:"She / love / ride / her bike →", blank:"She loves riding her bike.", after:"",
+   rule:"LOVE + -ing: ride → rid<b>ing</b> (rimuovi -e, aggiungi -ing).<br>Struttura: soggetto + love/like/hate + verbo-ing",
+   example:"He loves playing tennis. &nbsp;/&nbsp; She likes dancing."},
+
+  // ─── MIX ─────────────────────────────────────────────────
+  {type:"fill", topic:"Mixed — have to / must",
+   instruction:"Complete with <b>has to</b>, <b>have to</b>, or <b>must</b>.",
+   before:"My teacher says we", blank:"have to", after:"finish the project by Friday.",
+   rule:"HAVE TO = obbligo esterno (regola del professore).<br>MUST = obbligo personale o molto urgente.",
+   example:"We have to hand in our homework. &nbsp;/&nbsp; You must stop talking!"},
+
+  {type:"fill", topic:"Mixed — negative",
+   instruction:"Complete correctly.",
+   before:"She", blank:"doesn't have to", after:"cook today. Dad is doing it.",
+   rule:"DOESN'T HAVE TO = non è necessario (she = terza persona singolare).<br>Attenzione: NOT 'she don't have to'!",
+   example:"She doesn't have to go to school today."},
+
+  {type:"fill", topic:"Mixed — like + have to",
+   instruction:"Complete both blanks.",
+   before:"I don't like", blank:"doing", after:"the washing-up, but I have to do it.",
+   rule:"LIKE + -ing: do → do<b>ing</b>.<br>+ HAVE TO = obbligo (ma non mi piace!)",
+   example:"I don't like tidying, but I have to."},
+];
+
+// ── QUIZ ENGINE ──
+let v2Queue=[], v2Idx=0, v2Score=0, v2Wrong=[], v2Answered=false;
+let v2InputVal = '';
+
+function startV2Quiz() {
+  // pick 15 random exercises, ensure all topics covered
+  const byTopic = {};
+  V2_POOL.forEach(e => { if(!byTopic[e.topic]) byTopic[e.topic]=[];  byTopic[e.topic].push(e); });
+  let selected = [];
+  // at least 2 per main topic
+  ['have to — Affirmative','have to — Negative','have to — Interrogative','have to — Short answers','must','like + -ing'].forEach(t => {
+    const pool = byTopic[t] || [];
+    const shuffled = [...pool].sort(()=>Math.random()-0.5);
+    selected.push(...shuffled.slice(0, 2));
+  });
+  // fill up to 15 with randoms
+  const remaining = V2_POOL.filter(e => !selected.includes(e)).sort(()=>Math.random()-0.5);
+  selected.push(...remaining.slice(0, Math.max(0, 15-selected.length)));
+  v2Queue = selected.sort(()=>Math.random()-0.5);
+  v2Idx=0; v2Score=0; v2Wrong=[];
+  showV2Question();
+}
+
+function showV2Question() {
+  v2Answered=false; v2InputVal='';
+  const q=v2Queue[v2Idx], total=v2Queue.length;
+  document.getElementById('v2-counter').textContent=(v2Idx+1)+' / '+total;
+  const pct=(v2Idx/total*100)+'%';
+
+  const isTransform = q.type === 'transform';
+  const placeholder = isTransform ? 'Write the full sentence…' : 'Type your answer…';
+  const inputWidth = isTransform ? '100%' : 'auto';
+
+  let questionHTML = '';
+  if (isTransform) {
+    questionHTML = `
+      <div style="background:#f5f3ff;border-radius:12px;padding:12px 16px;margin-bottom:14px;font-size:15px;font-weight:700;color:#1f2937;">
+        "${q.before}"
+      </div>
+      <div style="font-size:13px;color:#6b7280;margin-bottom:10px;">Write as a question:</div>
+      <input class="v2-input" id="v2-input" type="text" placeholder="${placeholder}"
+        autocomplete="off" autocorrect="off" spellcheck="false"
+        onkeydown="v2Key(event)" oninput="v2InputVal=this.value"
+        style="width:100%;"/>`;
+  } else {
+    // fill-in with blank
+    questionHTML = `
+      <div class="fill-row" style="font-size:15px;font-weight:700;color:#1f2937;flex-wrap:wrap;gap:6px;margin-bottom:10px;">
+        ${q.before ? `<span>${q.before}</span>` : ''}
+        <input class="v2-input" id="v2-input" type="text" placeholder="…"
+          autocomplete="off" autocorrect="off" spellcheck="false"
+          onkeydown="v2Key(event)" oninput="v2InputVal=this.value"
+          style="min-width:160px;max-width:260px;"/>
+        ${q.after ? `<span>${q.after}</span>` : ''}
+      </div>`;
+  }
+
+  document.getElementById('v2-body').innerHTML = `
+    <div class="quiz-progress" style="width:100%;max-width:480px;">
+      <div class="quiz-progress-bar" style="width:${pct};background:linear-gradient(90deg,#7c3aed,#4c1d95);"></div>
+    </div>
+
+    <div class="quiz-card" style="max-width:480px;text-align:left;border-color:#ddd6fe;">
+      <div style="font-size:10px;font-weight:900;color:#a78bfa;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">${q.topic}</div>
+      <div style="font-size:14px;font-weight:700;color:#4c1d95;margin-bottom:14px;">${q.instruction}</div>
+      ${questionHTML}
+      <div id="v2-feedback" style="font-size:14px;font-weight:800;min-height:20px;margin-top:10px;"></div>
+      <div id="v2-rule" style="display:none;background:#f5f3ff;border-left:3px solid #7c3aed;border-radius:0 8px 8px 0;padding:10px 14px;margin-top:10px;font-size:13px;color:#4c1d95;line-height:1.7;"></div>
+    </div>
+
+    <button class="quiz-btn" id="v2-btn"
+      style="background:linear-gradient(135deg,#7c3aed,#4c1d95);box-shadow:0 4px 14px rgba(124,58,237,0.35);max-width:480px;"
+      onclick="checkV2()">Check ✓</button>`;
+
+  setTimeout(()=>{ const i=document.getElementById('v2-input'); if(i){i.focus();} }, 100);
+}
+
+function v2Key(e) {
+  if(e.key==='Enter') { if(!v2Answered) checkV2(); else nextV2(); }
+}
+
+function normalize(s) {
+  return s.toLowerCase().trim().replace(/['.!?,]/g,'').replace(/\s+/g,' ');
+}
+
+function checkV2() {
+  if(v2Answered) return;
+  const inp = document.getElementById('v2-input');
+  if (!inp || !inp.value.trim()) return;
+  v2Answered = true;
+  const q = v2Queue[v2Idx];
+  const val = normalize(inp.value);
+
+  // accept multiple correct forms
+  const correctForms = (Array.isArray(q.answers) ? q.answers : [q.blank]).map(a => normalize(a));
+  const ok = correctForms.includes(val);
+
+  const fb = document.getElementById('v2-feedback');
+  const ruleEl = document.getElementById('v2-rule');
+  const btn = document.getElementById('v2-btn');
+
+  if (ok) {
+    v2Score++;
+    inp.classList.add('correct');
+    fb.style.color = '#15803d';
+    fb.textContent = '✅ Correct! Well done!';
+    ruleEl.style.display = 'none';
+  } else {
+    v2Wrong.push(q);
+    inp.classList.add('wrong');
+    fb.style.color = '#dc2626';
+    fb.innerHTML = `❌ The correct answer is: <b style="color:#5b21b6">${q.blank}</b>`;
+
+    // Show rule + example
+    ruleEl.style.display = 'block';
+    ruleEl.innerHTML = `
+      <div style="font-weight:900;color:#5b21b6;margin-bottom:4px;">📖 Rule:</div>
+      <div style="margin-bottom:8px;">${q.rule}</div>
+      <div style="font-weight:900;color:#5b21b6;margin-bottom:4px;">✏️ Example:</div>
+      <div style="font-style:italic;">${q.example}</div>
+    `;
+
+    // Force Zoe to type the correct answer
+    inp.value = '';
+    inp.placeholder = 'Now type the correct answer…';
+    inp.classList.remove('wrong');
+    inp.style.borderColor = '#7c3aed';
+    inp.disabled = false;
+    inp.focus();
+
+    // change button to "retry"
+    btn.textContent = 'Type correct answer ✏️';
+    btn.onclick = retryV2;
+    return;
+  }
+
+  btn.textContent = v2Idx < v2Queue.length - 1 ? 'Next →' : 'Results 🏆';
+  btn.onclick = nextV2;
+}
+
+function retryV2() {
+  const inp = document.getElementById('v2-input');
+  const q = v2Queue[v2Idx];
+  const val = normalize(inp.value);
+  const correctForms = (Array.isArray(q.answers) ? q.answers : [q.blank]).map(a => normalize(a));
+
+  if (!inp.value.trim()) { inp.focus(); return; }
+
+  if (correctForms.includes(val)) {
+    inp.style.borderColor = '#22c55e';
+    inp.style.background = '#f0fdf4';
+    inp.style.color = '#15803d';
+    inp.disabled = true;
+    const btn = document.getElementById('v2-btn');
+    btn.textContent = v2Idx < v2Queue.length - 1 ? 'Next →' : 'Results 🏆';
+    btn.onclick = nextV2;
+  } else {
+    inp.style.borderColor = '#f87171';
+    inp.style.background = '#fef2f2';
+    inp.placeholder = 'Not quite — try again!';
+    inp.value = '';
+    inp.focus();
+  }
+}
+
+function nextV2() {
+  v2Idx++;
+  if (v2Idx >= v2Queue.length) showV2Results();
+  else showV2Question();
+}
+
+function showV2Results() {
+  const total = v2Queue.length;
+  const pct = Math.round(v2Score / total * 100);
+  const emoji = pct===100?'🏆':pct>=80?'🌟':pct>=60?'💪':'📚';
+  const msg = pct===100?'Perfect! Amazing work! 🎉':pct>=80?'Great job! Almost perfect!':pct>=60?'Good effort! Keep practising!':'Keep going! You can do it!';
+
+  let wrongHTML = '';
+  if (v2Wrong.length > 0) {
+    wrongHTML = `<div class="quiz-wrong-list" style="max-width:480px;width:100%;">
+      <div style="font-size:13px;font-weight:800;color:#5b21b6;margin-bottom:8px;">📖 Review these:</div>`;
+    v2Wrong.forEach(q => {
+      wrongHTML += `<div class="quiz-wrong-item" style="border-bottom:1px solid #ede9fe;">
+        <div style="font-size:12px;color:#a78bfa;font-weight:800;">${q.topic}</div>
+        <div style="color:#374151;">${q.before} <b style="color:#5b21b6;">${q.blank}</b> ${q.after}</div>
+        <div style="font-size:12px;color:#6b7280;font-style:italic;margin-top:2px;">${q.rule.replace(/<[^>]+>/g,'')}</div>
+      </div>`;
+    });
+    wrongHTML += '</div>';
+  }
+
+  document.getElementById('v2-counter').textContent = '';
+  document.getElementById('v2-body').innerHTML = `
+    <div class="quiz-score-card" style="max-width:480px;border-color:#ddd6fe;">
+      <div style="font-size:52px;margin-bottom:4px;">${emoji}</div>
+      <div class="quiz-score-big" style="color:#5b21b6;">${v2Score}/${total}</div>
+      <div class="quiz-score-label">${msg} (${pct}%)</div>
+    </div>
+    ${wrongHTML}
+    <button class="quiz-btn" style="background:linear-gradient(135deg,#7c3aed,#4c1d95);box-shadow:0 4px 14px rgba(124,58,237,0.35);max-width:480px;" onclick="startV2Quiz()">🔄 New session</button>
+    <button class="quiz-btn" style="background:linear-gradient(135deg,#6b7280,#4b5563);max-width:480px;margin-top:8px;" onclick="showScreen('screen-topics-en')">← Topics</button>`;
+  savePracticeDay();
+}
+
+// Hook showScreen
+const _ssV2 = window.showScreen;
+window.showScreen = function(id) {
+  _ssV2(id);
+  if (id === 'screen-verifica2') startV2Quiz();
+};
+
+// Add v2-input style
+const v2Style = document.createElement('style');
+v2Style.textContent = `
+  .v2-input {
+    border:2px solid #ddd6fe; border-radius:10px; padding:9px 13px;
+    font-size:15px; font-family:'Nunito',sans-serif; font-weight:700;
+    outline:none; color:#1f2937; transition:border .2s;
+  }
+  .v2-input:focus { border-color:#7c3aed; }
+  .v2-input.correct { border-color:#22c55e; background:#f0fdf4; color:#15803d; }
+  .v2-input.wrong   { border-color:#f87171; background:#fef2f2; color:#dc2626; }
+`;
+document.head.appendChild(v2Style);
+
+// ── TRANSLATION ──
+async function translateMsg(text, container) {
+  // remove existing translation
+  const existing = container.querySelector(".translation-bubble");
+  if (existing) { existing.remove(); return; }
+  const btn = container.querySelector(".translate-btn");
+  if (btn) btn.textContent = "⏳";
+  try {
+    const res = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 200,
+        messages: [{
+          role: "user",
+          content: "Translate this English text to Italian. Reply with ONLY the Italian translation, nothing else: " + text
+        }]
+      })
+    });
+    const data = await res.json();
+    const translation = data.content?.[0]?.text || "Traduzione non disponibile";
+    const bubble = document.createElement("div");
+    bubble.className = "translation-bubble";
+    bubble.textContent = "🇮🇹 " + translation;
+    container.appendChild(bubble);
+    if (btn) btn.textContent = "🇮🇹";
+  } catch(e) {
+    if (btn) btn.textContent = "🇮🇹";
+  }
+}
+</script>
+<!-- ══ QUIZ ══ -->
+<div id="screen-quiz" class="screen">
+  <div class="quiz-shell">
+    <div class="quiz-topbar">
+      <button class="back-btn" onclick="showScreen('screen-topics-en')">← Topics</button>
+      <span style="font-weight:800;color:#059669;font-size:15px;">🎯 Vocabulary Quiz</span>
+      <span id="quiz-counter" style="font-weight:800;color:#6ee7b7;font-size:13px;"></span>
+    </div>
+    <div class="quiz-body" id="quiz-body">
+      <!-- populated by JS -->
+    </div>
+  </div>
+</div>
+
+
+<!-- IRREGULAR VERBS QUIZ -->
+<div id="screen-verbquiz" class="screen">
+  <div class="quiz-shell">
+    <div class="quiz-topbar">
+      <button class="back-btn" onclick="showScreen('screen-topics-en')">← Topics</button>
+      <span style="font-weight:800;color:#059669;font-size:15px;">🔤 Irregular Verbs</span>
+      <span id="verbquiz-counter" style="font-weight:800;color:#6ee7b7;font-size:13px;"></span>
+    </div>
+    <div class="quiz-body" id="verbquiz-body"></div>
+  </div>
+</div>
+<!-- GRAMMAR QUIZ -->
+<div id="screen-grammarquiz" class="screen">
+  <div class="quiz-shell">
+    <div class="quiz-topbar">
+      <button class="back-btn" onclick="showScreen('screen-topics-en')">← Topics</button>
+      <span style="font-weight:800;color:#ea580c;font-size:15px;">📝 Grammar Exercises</span>
+      <span id="grammar-counter" style="font-weight:800;color:#fdba74;font-size:13px;"></span>
+    </div>
+    <div class="quiz-body" id="grammarquiz-body"></div>
+  </div>
+</div>
+
+<!-- READING EN -->
+<div id="screen-reading-en" class="screen">
+  <div class="quiz-shell">
+    <div class="quiz-topbar">
+      <button class="back-btn" onclick="goBackFromReading()">← Back</button>
+      <span style="font-weight:800;color:#2563eb;font-size:15px;">📖 Reading Comprehension</span>
+      <span id="reading-en-counter" style="font-weight:800;color:#93c5fd;font-size:13px;"></span>
+    </div>
+    <div class="quiz-body" id="reading-en-body"></div>
+  </div>
+</div>
+
+<!-- READING ES -->
+<div id="screen-reading-es" class="screen">
+  <div class="quiz-shell shell-es">
+    <div class="quiz-topbar topbar-es">
+      <button class="back-btn back-btn-es" onclick="showScreen('screen-topics-es')">← Atrás</button>
+      <span style="font-weight:800;color:#92400e;font-size:15px;">📖 Comprensión Lectora</span>
+      <span id="reading-es-counter" style="font-weight:800;color:#fcd34d;font-size:13px;"></span>
+    </div>
+    <div class="quiz-body" id="reading-es-body"></div>
+  </div>
+</div>
+
+<!-- VOCAB ES -->
+<div id="screen-vocabquiz-es" class="screen">
+  <div class="quiz-shell shell-es">
+    <div class="quiz-topbar topbar-es">
+      <button class="back-btn back-btn-es" onclick="showScreen('screen-topics-es')">← Atrás</button>
+      <span style="font-weight:800;color:#92400e;font-size:15px;">🎯 Vocabulario</span>
+      <span id="vocabes-counter" style="font-weight:800;color:#fcd34d;font-size:13px;"></span>
+    </div>
+    <div class="quiz-body" id="vocabes-body"></div>
+  </div>
+</div>
+
+<!-- GRAMMAR ES -->
+<div id="screen-grammarquiz-es" class="screen">
+  <div class="quiz-shell shell-es">
+    <div class="quiz-topbar topbar-es">
+      <button class="back-btn back-btn-es" onclick="showScreen('screen-topics-es')">← Atrás</button>
+      <span style="font-weight:800;color:#92400e;font-size:15px;">📝 Gramática</span>
+      <span id="grames-counter" style="font-weight:800;color:#fcd34d;font-size:13px;"></span>
+    </div>
+    <div class="quiz-body" id="grames-body"></div>
+  </div>
+</div>
+
+<!-- ══ VERIFICA 2 ══ -->
+<div id="screen-verifica2" class="screen">
+  <div class="quiz-shell" style="border-color:rgba(124,58,237,0.4);">
+    <div class="quiz-topbar" style="border-bottom-color:#ddd6fe;background:rgba(245,243,255,0.95);">
+      <button class="back-btn" style="background:#ede9fe;color:#5b21b6;" onclick="showScreen('screen-topics-en')">← Topics</button>
+      <span style="font-weight:800;color:#5b21b6;font-size:14px;">📋 Verifica 2</span>
+      <span id="v2-counter" style="font-weight:800;color:#a78bfa;font-size:13px;"></span>
+    </div>
+    <div class="quiz-body" id="v2-body"></div>
+  </div>
+</div>
+
+</body>
+</html>
