@@ -229,64 +229,6 @@ body {
 .grammar-feedback.wrong { color:#dc2626; }
 .grammar-explanation { font-size:13px; color:#6b7280; margin-top:6px; font-weight:600; font-style:italic; }
 
-/* ── LANGUAGE SELECT ── */
-.lang-select-screen {
-  min-height:100vh; display:flex; flex-direction:column;
-  align-items:center; justify-content:center; padding:24px 16px;
-  background:linear-gradient(160deg,#fdf6f0 0%,#f0eaf8 55%,#fef3e2 100%);
-}
-.lang-card {
-  background:rgba(255,255,255,0.9); border-radius:36px;
-  padding:40px 32px; text-align:center; max-width:380px; width:100%;
-  box-shadow:0 16px 56px rgba(80,40,120,0.13);
-  border:1.5px solid rgba(200,170,230,0.4);
-  animation:floatUp .6s ease both;
-}
-.lang-card h1 { font-family:"Baloo 2",cursive; font-size:30px; color:#5a2d82; margin:0 0 6px; }
-.lang-card p  { color:#8a6aaa; font-size:15px; font-weight:600; margin-bottom:28px; }
-.lang-btn {
-  width:100%; border:none; border-radius:20px; padding:18px 24px;
-  font-size:18px; font-weight:900; font-family:"Nunito",sans-serif;
-  cursor:pointer; margin-bottom:12px; transition:transform .15s, box-shadow .15s;
-  display:flex; align-items:center; gap:16px;
-}
-.lang-btn:hover { transform:scale(1.03) translateY(-2px); }
-.lang-btn.en { background:linear-gradient(135deg,#34d399,#059669); color:white; box-shadow:0 6px 20px rgba(5,150,105,0.35); }
-.lang-btn.es { background:linear-gradient(135deg,#f59e0b,#d97706); color:white; box-shadow:0 6px 20px rgba(217,119,6,0.35); }
-.lang-btn .flag { font-size:36px; }
-.lang-btn .lang-info { text-align:left; }
-.lang-btn .lang-name { font-size:20px; display:block; }
-.lang-btn .lang-sub  { font-size:13px; font-weight:700; opacity:.85; display:block; }
-
-/* ── SPANISH COLORS ── */
-.shell-es { border-color:rgba(251,191,36,0.4) !important; }
-.topbar-es { border-bottom-color:#fde68a !important; background:rgba(255,252,235,0.95) !important; }
-.topbar-es span { color:#92400e !important; }
-.back-btn-es { background:#fef3c7 !important; color:#92400e !important; }
-.bubble-es { background:rgba(255,252,235,0.98) !important; border-color:#fde68a !important; color:#451a03 !important; }
-.bubble-user-es { background:linear-gradient(135deg,#f59e0b,#d97706) !important; }
-.input-es { border-color:#fcd34d !important; }
-.send-btn-es { background:linear-gradient(135deg,#f59e0b,#d97706) !important; box-shadow:0 4px 14px rgba(217,119,6,0.35) !important; }
-.mic-btn-es { background:#fef3c7 !important; border-color:#fcd34d !important; }
-
-/* ── READING COMPREHENSION ── */
-.reading-card {
-  background:white; border-radius:20px; padding:24px 20px;
-  width:100%; max-width:480px; border:2px solid #bbf7d0;
-  box-shadow:0 4px 20px rgba(0,0,0,0.07); margin-bottom:12px;
-}
-.reading-card.es { border-color:#fcd34d; }
-.reading-title { font-family:"Baloo 2",cursive; font-size:18px; color:#065f46; margin-bottom:4px; }
-.reading-title.es { color:#92400e; }
-.reading-meta { font-size:12px; color:#9ca3af; font-weight:700; margin-bottom:14px; }
-.reading-text {
-  font-size:15px; line-height:1.8; color:#1f2937; font-weight:600;
-  background:#f8fafc; border-radius:12px; padding:16px; margin-bottom:16px;
-  max-height:200px; overflow-y:auto;
-}
-.reading-question { font-size:15px; font-weight:800; color:#1f2937; margin:16px 0 10px; }
-.reading-progress { font-size:12px; color:#9ca3af; font-weight:700; margin-bottom:8px; }
-
 /* ── CALENDAR ── */
 .calendar-wrap {
   width:100%; max-width:380px; margin:20px auto 0;
@@ -354,7 +296,7 @@ body {
 <!-- Sound unlock banner -->
 <button class="sound-banner" id="sound-banner" onclick="unlockAudio()">🔊 Tap to enable sound!</button>
 
-<div id="screen-langselect" class="screen active" style="width:100%;max-width:580px;">
+<div id="screen-welcome" class="screen active">
   <div class="welcome-card">
     <div class="lily-wrap" style="margin:0 auto;">
       <div id="lottie-welcome" class="lily-lottie" style="width:180px;height:180px;"></div>
@@ -363,7 +305,7 @@ body {
     </div>
     <h1>Hi! I'm Lily! 🌟</h1>
     <p>Your friendly English teacher.<br/>Let's practise together!</p>
-    <button class="primary-btn" onclick="showScreen('screen-topics-en')">Let's start! ✨</button>
+    <button class="primary-btn" onclick="showTopics()">Let's start! ✨</button>
   </div>
   <!-- CALENDAR -->
   <div class="calendar-wrap">
@@ -378,37 +320,7 @@ body {
 </div>
 
 <!-- TOPICS -->
-<!-- ENGLISH WELCOME -->
-<div id="screen-welcome-en" class="screen">
-  <div class="welcome-card">
-    <div class="lily-wrap" style="margin:0 auto;">
-      <div id="lottie-welcome" class="lily-lottie" style="width:180px;height:180px;"></div>
-      <span class="sparkle" style="top:-8px;right:0;font-size:22px;">✨</span>
-      <span class="sparkle s2" style="top:10px;right:18px;font-size:14px;">⭐</span>
-    </div>
-    <h1>Hi! I'm Lily! 🌟</h1>
-    <p>Your friendly English teacher.<br/>Let's practise together!</p>
-    <button class="primary-btn" onclick="showScreen('screen-topics-en')">Let's start! ✨</button>
-    <button onclick="showScreen('screen-langselect')" style="background:none;border:none;color:#9ca3af;font-size:13px;font-weight:700;cursor:pointer;margin-top:10px;">← Cambia lingua</button>
-  </div>
-</div>
-
-<!-- SPANISH WELCOME -->
-<div id="screen-welcome-es" class="screen">
-  <div class="welcome-card" style="border-color:rgba(251,191,36,0.4);">
-    <div class="lily-wrap" style="margin:0 auto;">
-      <div id="lottie-welcome-es" class="lily-lottie" style="width:180px;height:180px;"></div>
-      <span class="sparkle" style="top:-8px;right:0;font-size:22px;">✨</span>
-      <span class="sparkle s2" style="top:10px;right:18px;font-size:14px;">⭐</span>
-    </div>
-    <h1 style="color:#92400e;">¡Hola! Soy Lola! 🌻</h1>
-    <p style="color:#b45309;">Tu profesora de español.<br/>¡Vamos a practicar juntas!</p>
-    <button class="primary-btn" style="background:linear-gradient(135deg,#f59e0b,#d97706);box-shadow:0 6px 20px rgba(217,119,6,0.38);" onclick="showScreen('screen-topics-es')">¡Empezamos! ✨</button>
-    <button onclick="showScreen('screen-langselect')" style="background:none;border:none;color:#9ca3af;font-size:13px;font-weight:700;cursor:pointer;margin-top:10px;">← Cambia lingua</button>
-  </div>
-</div>
-
-<div id="screen-topics-en" class="screen">
+<div id="screen-topics" class="screen">
   <div class="topics-wrap">
     <div class="topics-header">
       <div class="lily-wrap" style="margin:0 auto;">
@@ -429,38 +341,11 @@ body {
   </div>
 </div>
 
-<!-- SPANISH TOPICS -->
-<div id="screen-topics-es" class="screen">
-  <div class="topics-wrap">
-    <div class="topics-header">
-      <div class="lily-wrap" style="margin:0 auto;">
-        <div id="lottie-topics-es" class="lily-lottie" style="width:100px;height:100px;"></div>
-      </div>
-      <h2 style="color:#92400e;">¿De qué quieres hablar? 🌻</h2>
-    </div>
-    <div style="display:flex;flex-direction:column;gap:8px;width:100%;margin-bottom:14px;">
-      <button class="quiz-btn" onclick="showScreen('screen-vocabquiz-es')" style="font-size:15px;padding:11px 20px;background:linear-gradient(135deg,#f59e0b,#d97706);box-shadow:0 4px 14px rgba(217,119,6,0.35);">
-        🎯 Vocabulario — Casa y Hogar
-      </button>
-      <button class="quiz-btn" onclick="showScreen('screen-grammarquiz-es')" style="font-size:15px;padding:11px 20px;background:linear-gradient(135deg,#fb923c,#ea580c);">
-        📝 Ejercicios de Gramática
-      </button>
-      <button class="quiz-btn" onclick="showScreen('screen-reading-es')" style="font-size:15px;padding:11px 20px;background:linear-gradient(135deg,#a78bfa,#7c3aed);">
-        📖 Comprensión Lectora
-      </button>
-      <button class="quiz-btn" onclick="showScreen('screen-reading-en')" style="font-size:15px;padding:11px 20px;background:linear-gradient(135deg,#60a5fa,#2563eb);margin-top:4px;" id="btn-reading-en-from-es" >
-        📖 Reading Comprehension (EN)
-      </button>
-    </div>
-    <div class="topic-grid" id="topic-grid-es"></div>
-  </div>
-</div>
-
 <!-- CHAT -->
 <div id="screen-chat" class="screen">
   <div class="chat-shell">
     <div class="chat-topbar">
-      <button class="back-btn" onclick="showScreen('screen-topics-en')">← Topics</button>
+      <button class="back-btn" onclick="showTopics()">← Topics</button>
       <span id="chat-title" style="font-weight:800;color:#0d9b6a;font-size:15px;"></span>
       <div style="width:72px"></div>
     </div>
@@ -545,7 +430,7 @@ function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
 }
-function showScreen('screen-topics-en') { showScreen('screen-topics-en'); }
+function showTopics() { showScreen('screen-topics'); }
 
 // ── CHAT STATE ──
 let messages = [], currentTopic = null, loading = false;
@@ -978,7 +863,7 @@ function showResults() {
       ${wrongHTML}
     </div>
     <button class="quiz-btn" onclick="startQuiz()">🔄 Ricomincia</button>
-    <button class="quiz-btn pink" onclick="showScreen('screen-topics-en')" style="margin-top:8px;">← Topics</button>
+    <button class="quiz-btn pink" onclick="showScreen('screen-topics')" style="margin-top:8px;">← Topics</button>
   `;
   savePracticeDay();
 }
@@ -1068,7 +953,7 @@ function showVerbResults(){
   let wHTML='';
   if(verbWrong.length>0){wHTML='<div class="quiz-wrong-list"><b style="font-size:13px;color:#6b7280;">Da ripassare:</b>';verbWrong.forEach(v=>{wHTML+=`<div class="quiz-wrong-item">${v.base} → <b>${v.ps}</b> → <b>${v.pp}</b></div>`;});wHTML+='</div>';}
   document.getElementById('verbquiz-counter').textContent='';
-  document.getElementById('verbquiz-body').innerHTML=`<div class="quiz-score-card"><div style="font-size:48px">${emoji}</div><div class="quiz-score-big">${verbScore}/${total}</div><div class="quiz-score-label">${msg} (${pct}%)</div>${wHTML}</div><button class="quiz-btn" onclick="startVerbQuiz()">🔄 Ricomincia</button><button class="quiz-btn pink" onclick="showScreen('screen-topics-en')" style="margin-top:8px;">← Topics</button>`;
+  document.getElementById('verbquiz-body').innerHTML=`<div class="quiz-score-card"><div style="font-size:48px">${emoji}</div><div class="quiz-score-big">${verbScore}/${total}</div><div class="quiz-score-label">${msg} (${pct}%)</div>${wHTML}</div><button class="quiz-btn" onclick="startVerbQuiz()">🔄 Ricomincia</button><button class="quiz-btn pink" onclick="showScreen('screen-topics')" style="margin-top:8px;">← Topics</button>`;
   savePracticeDay();
 }
 
@@ -1140,442 +1025,11 @@ function showGramResults(){
   let wHTML='';
   if(gramWrong.length>0){wHTML='<div class="quiz-wrong-list"><b style="font-size:13px;color:#6b7280;">Da ripassare:</b>';gramWrong.forEach(q=>{wHTML+=`<div class="quiz-wrong-item"><span>${q.topic}</span></div>`;});wHTML+='</div>';}
   document.getElementById('grammar-counter').textContent='';
-  document.getElementById('grammarquiz-body').innerHTML=`<div class="quiz-score-card"><div style="font-size:48px">${emoji}</div><div class="quiz-score-big">${gramScore}/${total}</div><div class="quiz-score-label">${msg} (${pct}%)</div>${wHTML}</div><button class="quiz-btn" style="background:linear-gradient(135deg,#fb923c,#ea580c)" onclick="startGrammarQuiz()">🔄 Ricomincia</button><button class="quiz-btn pink" onclick="showScreen('screen-topics-en')" style="margin-top:8px;">← Topics</button>`;
+  document.getElementById('grammarquiz-body').innerHTML=`<div class="quiz-score-card"><div style="font-size:48px">${emoji}</div><div class="quiz-score-big">${gramScore}/${total}</div><div class="quiz-score-label">${msg} (${pct}%)</div>${wHTML}</div><button class="quiz-btn" style="background:linear-gradient(135deg,#fb923c,#ea580c)" onclick="startGrammarQuiz()">🔄 Ricomincia</button><button class="quiz-btn pink" onclick="showScreen('screen-topics')" style="margin-top:8px;">← Topics</button>`;
   savePracticeDay();
 }
 const _prevShowScreen2=window.showScreen;
 window.showScreen=function(id){_prevShowScreen2(id);if(id==='screen-verbquiz')startVerbQuiz();if(id==='screen-grammarquiz')startGrammarQuiz();};
-
-
-// ── LANGUAGE MANAGEMENT ──
-let currentLang = 'en';
-let readingFromLang = 'en';
-
-function selectLang(lang) {
-  currentLang = lang;
-  if (lang === 'en') {
-    showScreen('screen-welcome-en');
-    if (anim_welcome) anim_welcome.play();
-  } else {
-    showScreen('screen-welcome-es');
-    if (anim_welcome_es) anim_welcome_es.play();
-  }
-}
-
-function goBackFromReading() {
-  showScreen(readingFromLang === 'es' ? 'screen-topics-es' : 'screen-topics-en');
-}
-
-// load extra Lottie instances
-window.addEventListener('load', () => {
-  setTimeout(() => {
-    const cfg2 = { renderer:'svg', loop:true, autoplay:true, animationData: LOTTIE_DATA };
-    if (document.getElementById('lottie-welcome-es'))
-      window.anim_welcome_es = lottie.loadAnimation({...cfg2, container: document.getElementById('lottie-welcome-es')});
-    if (document.getElementById('lottie-topics-es'))
-      window.anim_topics_es = lottie.loadAnimation({...cfg2, container: document.getElementById('lottie-topics-es')});
-    if (document.getElementById('lottie-chat-es'))
-      window.anim_chat_es = lottie.loadAnimation({...cfg2, container: document.getElementById('lottie-chat-es')});
-  }, 600);
-});
-
-// ── SPANISH TOPICS ──
-const TOPICS_ES = [
-  { id:"familia",  emoji:"👨‍👩‍👧", label:"Mi Familia",    bg:"#fef9ee", border:"#fcd34d", prompt:"Empieza la conversación. Di hola y pregunta: ¿cuántas personas hay en tu familia? Usa español A2 sencillo." },
-  { id:"casa",     emoji:"🏠",     label:"Mi Casa",      bg:"#eff6ff", border:"#93c5fd", prompt:"Empieza. Di hola y pregunta: ¿vives en una casa o en un piso? Usa español A2 sencillo." },
-  { id:"animales", emoji:"🐾",     label:"Animales",     bg:"#f0fdf4", border:"#86efac", prompt:"Empieza. Di hola y pregunta: ¿tienes alguna mascota? Usa español A2 sencillo." },
-  { id:"comida",   emoji:"🍕",     label:"Comida",       bg:"#fff7ed", border:"#fdba74", prompt:"Empieza. Di hola y pregunta: ¿cuál es tu comida favorita? Usa español A2 sencillo." },
-  { id:"escuela",  emoji:"🏫",     label:"El Colegio",   bg:"#fdf4ff", border:"#d8b4fe", prompt:"Empieza. Di hola y pregunta: ¿cuál es tu asignatura favorita? Usa español A2 sencillo." },
-  { id:"tiempo",   emoji:"🌤️",    label:"El Tiempo",    bg:"#ecfeff", border:"#67e8f9", prompt:"Empieza. Di hola y pregunta: ¿qué tiempo hace hoy? Usa español A2 sencillo." },
-  { id:"deporte",  emoji:"⚽",     label:"Deportes",     bg:"#f7fee7", border:"#a3e635", prompt:"Empieza. Di hola y pregunta: ¿practicas algún deporte? Usa español A2 sencillo." },
-  { id:"amigos",   emoji:"👫",     label:"Amigos",       bg:"#fefce8", border:"#fde047", prompt:"Empieza. Di hola y pregunta: háblame de tu mejor amigo/a. Usa español A2 sencillo." },
-];
-
-const gridEs = document.getElementById('topic-grid-es');
-if (gridEs) {
-  TOPICS_ES.forEach(t => {
-    const btn = document.createElement('button');
-    btn.className = 'topic-btn';
-    btn.style.background = t.bg;
-    btn.style.borderColor = t.border;
-    btn.innerHTML = `<span style="font-size:28px">${t.emoji}</span><span class="tlabel">${t.label}</span>`;
-    btn.onclick = () => startTopicEs(t);
-    gridEs.appendChild(btn);
-  });
-}
-
-// ── SPANISH SYSTEM PROMPT ──
-const SYSTEM_PROMPT_ES = `Eres Lola, una profesora de español simpática y animada para estudiantes jóvenes de nivel A2 (10-14 años).
-PERSONALIDAD: Paciente, divertida, usa palabras simples, siempre amable.
-REGLAS DE IDIOMA:
-- Solo vocabulario A2. Frases cortas (máx 12 palabras).
-- Máximo 3 frases por respuesta.
-- Haz exactamente UNA pregunta simple al final de cada respuesta.
-- Nunca digas "incorrecto" o "error". Corrige naturalmente repitiendo la forma correcta.
-- Añade siempre un ánimo: "¡Muy bien!", "¡Perfecto!", "¡Excelente!", "¡Genial!".
-- Usa 1-2 emojis por respuesta.
-REGLA DE CORRECCIÓN: Si el estudiante comete un error, añade al final: "💡 ¿Querías decir: [versión correcta]?"
-REGLA DE TEMA: Solo habla del tema elegido. Si cambia de tema: "¡Sigamos practicando español! 😊"`;
-
-let esMessages = [], esCurrentTopic = null;
-
-async function startTopicEs(t) {
-  esCurrentTopic = t; esMessages = [];
-  const col = document.getElementById('msg-col');
-  if (col) col.innerHTML = '';
-  document.getElementById('chat-title').textContent = t.emoji + ' ' + t.label;
-  currentLang = 'es';
-  showScreen('screen-chat');
-  await fetchLola([{ role:'user', content: t.prompt }]);
-}
-
-async function fetchLola(history) {
-  setLoading(true); addTyping();
-  try {
-    const res = await fetch('/api/chat', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:1000, system:SYSTEM_PROMPT_ES, messages:history })
-    });
-    const data = await res.json();
-    const text = data.content?.[0]?.text || '¿Puedes repetir? 😊';
-    removeTyping(); window.addBubble('lily', text);
-    esMessages.push({ role:'assistant', content:text });
-  } catch(e) { removeTyping(); window.addBubble('lily', '¡Ups! Algo fue mal. ¡Inténtalo de nuevo! 😊'); }
-  setLoading(false);
-}
-
-// Patch sendMsg to handle Spanish
-const _origSendMsg = window.sendMsg || sendMsg;
-window.sendMsg = async function() {
-  if (currentLang === 'es' && esCurrentTopic) {
-    const input = document.getElementById('chat-input');
-    const text = input.value.trim();
-    if (!text || loading) return;
-    input.value = '';
-    esMessages.push({ role:'user', content:text });
-    window.addBubble('user', text);
-    const history = [
-      { role:'user', content: esCurrentTopic.prompt },
-      { role:'assistant', content: esMessages[0]?.content || '' },
-      ...esMessages.slice(1),
-    ];
-    await fetchLola(history);
-  } else {
-    await sendMsg();
-  }
-};
-
-// ── READING COMPREHENSION — ENGLISH ──
-const READINGS_EN = [
-  {
-    title: "A Day at School",
-    text: `My name is Emma and I am 13 years old. I go to Greenfield Secondary School. My favourite subject is Science because we do interesting experiments. Yesterday, we made a volcano with vinegar and baking soda. It was amazing! After school, I usually do my homework for one hour. Then I have dinner with my family. We always eat together at 7 o'clock. At the weekend, I like playing tennis with my dad. I am not very good, but it is fun!`,
-    questions: [
-      { q:"How old is Emma?", options:["12","13","14","15"], correct:1 },
-      { q:"What is her favourite subject?", options:["Maths","English","Science","History"], correct:2 },
-      { q:"What did she make yesterday?", options:["A robot","A cake","A volcano","A painting"], correct:2 },
-      { q:"What does she do at the weekend?", options:["Swimming","Tennis","Football","Reading"], correct:1 },
-    ]
-  },
-  {
-    title: "My Family",
-    text: `I live in a small house with my family. There are five people in my family: my mum, my dad, my grandma, my brother Tom and me. My mum is a teacher and my dad is a doctor. Tom is eight years old and he loves video games. My grandma lives with us because she is old and we help her every day. We have a dog called Max. He is very funny and energetic. Every morning, Tom and I take Max for a walk before school. It is sometimes cold but we always enjoy it.`,
-    questions: [
-      { q:"How many people are in the family?", options:["3","4","5","6"], correct:2 },
-      { q:"What does the dad do?", options:["He is a teacher","He is a doctor","He is an engineer","He is a chef"], correct:1 },
-      { q:"Why does grandma live with them?", options:["She likes the house","She is old and needs help","She has no money","She loves Max"], correct:1 },
-      { q:"What is the dog's name?", options:["Tom","Rex","Max","Buddy"], correct:2 },
-    ]
-  },
-  {
-    title: "A Weekend Adventure",
-    text: `Last Saturday, my friend Jake and I went to the city park. We took the bus because it was too far to walk. First, we played football with some other kids we met there. Then we bought ice cream — I had chocolate and Jake had strawberry. After that, we sat by the lake and watched the ducks. It started to rain at about four o'clock, so we ran to the bus stop. We were a little wet but very happy. When I got home, my mum laughed because my hair was completely wet. It was one of the best days of the summer!`,
-    questions: [
-      { q:"How did they get to the park?", options:["By bike","By car","By bus","On foot"], correct:2 },
-      { q:"What flavour ice cream did Jake have?", options:["Chocolate","Vanilla","Strawberry","Lemon"], correct:2 },
-      { q:"What happened at four o'clock?", options:["They played football","It started to rain","They went home","They ate lunch"], correct:1 },
-      { q:"How did the narrator feel at the end?", options:["Tired and sad","Wet but happy","Angry and cold","Bored and hungry"], correct:1 },
-    ]
-  },
-];
-
-const READINGS_ES = [
-  {
-    title: "Un día en el mercado",
-    text: `El sábado por la mañana, mi madre y yo fuimos al mercado del barrio. Había muchos puestos con frutas, verduras y flores. Compramos tomates, manzanas y un poco de queso. El señor del puesto de frutas era muy simpático y nos dio una naranja gratis. También vi a mi amiga Sofía con su abuela. Tomamos un zumo de naranja en un café pequeño y charlamos un rato. Hacía mucho sol y la gente estaba muy contenta. Me gusta mucho ir al mercado porque es más divertido que ir al supermercado.`,
-    questions: [
-      { q:"¿Cuándo fueron al mercado?", options:["El viernes por la tarde","El sábado por la mañana","El domingo al mediodía","El lunes por la mañana"], correct:1 },
-      { q:"¿Qué les dio el señor del puesto gratis?", options:["Un tomate","Una manzana","Un poco de queso","Una naranja"], correct:3 },
-      { q:"¿A quién vio la narradora en el mercado?", options:["A su profesora","A su amiga Sofía","A su primo","A su vecina"], correct:1 },
-      { q:"¿Por qué le gusta el mercado?", options:["Es más barato","Es más cerca","Es más divertido","Es más grande"], correct:2 },
-    ]
-  },
-  {
-    title: "Mi rutina diaria",
-    text: `Me llamo Carlos y tengo catorce años. Vivo en Madrid con mis padres y mi hermana pequeña, Ana. Mi rutina de cada día es siempre igual. Me levanto a las siete de la mañana y desayuno cereales con leche. Luego voy al colegio en metro. Las clases empiezan a las ocho y media y terminan a las tres. Por la tarde, hago los deberes y, si tengo tiempo, juego al baloncesto con mis amigos en el parque. Me gusta mucho el baloncesto porque soy bastante alto. Por la noche, ceno con mi familia y veo la televisión un poco antes de dormir.`,
-    questions: [
-      { q:"¿Cuántos años tiene Carlos?", options:["12","13","14","15"], correct:2 },
-      { q:"¿Cómo va Carlos al colegio?", options:["En autobús","En coche","En metro","A pie"], correct:2 },
-      { q:"¿A qué hora terminan las clases?", options:["A las dos","A las tres","A las cuatro","A las dos y media"], correct:1 },
-      { q:"¿Por qué le gusta el baloncesto a Carlos?", options:["Es fácil","Sus amigos juegan","Es bastante alto","Su padre juega"], correct:2 },
-    ]
-  },
-  {
-    title: "Las vacaciones de verano",
-    text: `El verano pasado, mi familia y yo fuimos de vacaciones a la costa. Estuvimos en un hotel pequeño cerca de la playa durante una semana. Cada mañana, mis padres tomaban el sol mientras mi hermano y yo nadábamos en el mar. El agua estaba un poco fría pero nos divertimos mucho. Un día, hicimos una excursión en barco y vimos delfines. Fue increíble. También probé el pulpo por primera vez — ¡estaba delicioso! Al final de las vacaciones, no quería volver a casa. Espero volver el año que viene.`,
-    questions: [
-      { q:"¿Dónde pasó las vacaciones la familia?", options:["En las montañas","En el campo","En la ciudad","En la costa"], correct:3 },
-      { q:"¿Cuánto tiempo estuvieron de vacaciones?", options:["Tres días","Una semana","Dos semanas","Un mes"], correct:1 },
-      { q:"¿Qué vieron durante la excursión en barco?", options:["Tiburones","Ballenas","Delfines","Tortugas"], correct:2 },
-      { q:"¿Qué probó la narradora por primera vez?", options:["El pulpo","La paella","El gazpacho","Las gambas"], correct:0 },
-    ]
-  },
-];
-
-let readingData=[], readingIndex=0, readingQIndex=0, readingScore=0, readingLang='en', readingAnswered=false;
-
-function startReading(lang) {
-  readingLang=lang; readingFromLang=lang;
-  readingData = lang==='en' ? [...READINGS_EN] : [...READINGS_ES];
-  readingData.sort(()=>Math.random()-0.5);
-  readingIndex=0; readingScore=0; showReadingText();
-}
-
-function showReadingText() {
-  readingQIndex=0; readingAnswered=false;
-  const r=readingData[readingIndex], total=readingData.length;
-  const lang=readingLang, isEs=lang==='es';
-  const counterEl=document.getElementById('reading-'+lang+'-counter');
-  if(counterEl) counterEl.textContent=(readingIndex+1)+' / '+total;
-  const bodyEl=document.getElementById('reading-'+lang+'-body');
-  bodyEl.innerHTML=`
-    <div class="reading-card ${isEs?'es':''}">
-      <div class="reading-title ${isEs?'es':''}">${r.title}</div>
-      <div class="reading-meta">${isEs?'Texto':'Text'} ${readingIndex+1}/${total}</div>
-      <div class="reading-text">${r.text}</div>
-    </div>
-    <button class="quiz-btn" style="background:${isEs?'linear-gradient(135deg,#f59e0b,#d97706)':'linear-gradient(135deg,#60a5fa,#2563eb)'};" onclick="showReadingQuestion()">
-      ${isEs?'Responder preguntas →':'Answer questions →'}
-    </button>`;
-}
-
-function showReadingQuestion() {
-  readingAnswered=false;
-  const r=readingData[readingIndex], q=r.questions[readingQIndex];
-  const lang=readingLang, isEs=lang==='es', total=r.questions.length;
-  const bodyEl=document.getElementById('reading-'+lang+'-body');
-  bodyEl.innerHTML=`
-    <div class="reading-card ${isEs?'es':''}">
-      <div class="reading-title ${isEs?'es':''}">${r.title}</div>
-      <div class="reading-progress">${isEs?'Pregunta':'Question'} ${readingQIndex+1}/${total}</div>
-      <div class="reading-question">${q.q}</div>
-      <div class="mc-options">
-        ${q.options.map((opt,i)=>`<button class="mc-btn" id="rmc-${i}" onclick="checkReadingMC(${i})">${opt}</button>`).join('')}
-      </div>
-      <div class="grammar-feedback" id="r-feedback"></div>
-    </div>`;
-}
-
-function checkReadingMC(chosen) {
-  if(readingAnswered) return; readingAnswered=true;
-  const r=readingData[readingIndex], q=r.questions[readingQIndex];
-  const lang=readingLang, isEs=lang==='es';
-  q.options.forEach((_,i)=>{
-    const el=document.getElementById('rmc-'+i);
-    if(i===q.correct) el.classList.add('show-correct');
-    else if(i===chosen&&chosen!==q.correct) el.classList.add('wrong');
-    el.disabled=true;
-  });
-  const fb=document.getElementById('r-feedback');
-  if(chosen===q.correct){ readingScore++; fb.className='grammar-feedback correct'; fb.textContent=isEs?'✅ ¡Correcto!':'✅ Correct!'; }
-  else { fb.className='grammar-feedback wrong'; fb.textContent=isEs?('❌ '+q.options[q.correct]):('❌ '+q.options[q.correct]); }
-  const bodyEl=document.getElementById('reading-'+lang+'-body');
-  const nextBtn=document.createElement('button');
-  nextBtn.className='quiz-btn';
-  nextBtn.style.background=isEs?'linear-gradient(135deg,#f59e0b,#d97706)':'linear-gradient(135deg,#60a5fa,#2563eb)';
-  nextBtn.style.marginTop='12px';
-  const isLastQ=readingQIndex>=r.questions.length-1;
-  const isLastT=readingIndex>=readingData.length-1;
-  nextBtn.textContent=isLastQ?(isLastT?(isEs?'Resultados 🏆':'Results 🏆'):(isEs?'Siguiente texto →':'Next text →')):(isEs?'Siguiente pregunta →':'Next question →');
-  nextBtn.onclick=()=>{ if(isLastQ){if(isLastT)showReadingResults();else{readingIndex++;showReadingText();}}else{readingQIndex++;readingAnswered=false;showReadingQuestion();} };
-  bodyEl.appendChild(nextBtn);
-}
-
-function showReadingResults() {
-  const lang=readingLang, isEs=lang==='es';
-  const total=readingData.reduce((s,r)=>s+r.questions.length,0);
-  const pct=Math.round(readingScore/total*100);
-  const emoji=pct===100?'🏆':pct>=70?'🌟':pct>=40?'💪':'📚';
-  document.getElementById('reading-'+lang+'-counter').textContent='';
-  document.getElementById('reading-'+lang+'-body').innerHTML=`
-    <div class="quiz-score-card">
-      <div style="font-size:48px">${emoji}</div>
-      <div class="quiz-score-big">${readingScore}/${total}</div>
-      <div class="quiz-score-label">${pct>=70?(isEs?'¡Muy bien!':'Great job!'):(isEs?'¡Sigue practicando!':'Keep practising!')} (${pct}%)</div>
-    </div>
-    <button class="quiz-btn" style="background:${isEs?'linear-gradient(135deg,#f59e0b,#d97706)':'linear-gradient(135deg,#60a5fa,#2563eb)'};" onclick="startReading('${lang}')">🔄 ${isEs?'Reiniciar':'Restart'}</button>
-    <button class="quiz-btn pink" onclick="showScreen('${isEs?'screen-topics-es':'screen-topics-en'}')" style="margin-top:8px;">← ${isEs?'Temas':'Topics'}</button>`;
-  savePracticeDay();
-}
-
-// ── SPANISH VOCABULARY QUIZ ──
-const WORDS_ES = [
-  {es:"el cuarto de baño", en:"el cuarto de baño", hint:"bathroom"},
-  {es:"la cocina",        hint:"kitchen"},
-  {es:"el salón",         hint:"living room"},
-  {es:"el dormitorio",    hint:"bedroom"},
-  {es:"limpiar",          hint:"to clean"},
-  {es:"barrer",           hint:"to sweep"},
-  {es:"fregar los platos",hint:"to wash up"},
-  {es:"hacer la cama",    hint:"to make the bed"},
-  {es:"pasar la aspiradora", hint:"to vacuum"},
-  {es:"poner la mesa",    hint:"to set the table"},
-  {es:"sacar la basura",  hint:"to take out the rubbish"},
-  {es:"planchar",         hint:"to iron"},
-  {es:"lavar la ropa",    hint:"to do the washing"},
-  {es:"ordenar",          hint:"to tidy up"},
-  {es:"cocinar",          hint:"to cook"},
-  {es:"el cubo de basura",hint:"bin"},
-  {es:"la escoba",        hint:"broom"},
-  {es:"el fregadero",     hint:"sink"},
-  {es:"la lavadora",      hint:"washing machine"},
-  {es:"el lavavajillas",  hint:"dishwasher"},
-];
-
-// For Spanish vocab: show Spanish word, student writes the English hint
-let vocabEsQueue=[],vocabEsIndex=0,vocabEsScore=0,vocabEsWrong=[],vocabEsAnswered=false;
-
-function startVocabEs(){
-  vocabEsQueue=[...WORDS_ES].sort(()=>Math.random()-0.5);
-  vocabEsIndex=0;vocabEsScore=0;vocabEsWrong=[];showVocabEsQuestion();
-}
-
-function showVocabEsQuestion(){
-  vocabEsAnswered=false;
-  const w=vocabEsQueue[vocabEsIndex],total=vocabEsQueue.length;
-  document.getElementById('vocabes-counter').textContent=(vocabEsIndex+1)+' / '+total;
-  const pct=(vocabEsIndex/total*100)+'%';
-  document.getElementById('vocabes-body').innerHTML=`
-    <div class="quiz-progress" style="width:100%;max-width:400px;"><div class="quiz-progress-bar" style="width:${pct};background:linear-gradient(90deg,#f59e0b,#d97706);"></div></div>
-    <div class="quiz-card" style="border-color:#fcd34d;">
-      <div class="quiz-label" style="color:#d97706;">¿Cómo se dice en inglés?</div>
-      <div class="quiz-word" style="color:#92400e;">${w.es}</div>
-      <div class="quiz-hint">Escribe la traducción en inglés</div>
-      <input class="quiz-input" id="vocabes-input" type="text" placeholder="..." autocomplete="off" autocorrect="off" spellcheck="false" onkeydown="vocabEsKey(event)" style="border-color:#fcd34d;"/>
-      <div class="quiz-feedback" id="vocabes-feedback"></div>
-    </div>
-    <button class="quiz-btn" id="vocabes-btn" onclick="checkVocabEs()" style="background:linear-gradient(135deg,#f59e0b,#d97706);box-shadow:0 4px 14px rgba(217,119,6,0.35);">Comprobar ✓</button>`;
-  setTimeout(()=>{const i=document.getElementById('vocabes-input');if(i)i.focus();},100);
-}
-
-function vocabEsKey(e){if(e.key==='Enter'){if(!vocabEsAnswered)checkVocabEs();else nextVocabEs();}}
-
-function checkVocabEs(){
-  if(vocabEsAnswered)return; vocabEsAnswered=true;
-  const w=vocabEsQueue[vocabEsIndex];
-  const val=document.getElementById('vocabes-input').value.trim().toLowerCase();
-  const correct=w.hint.toLowerCase();
-  const alts=correct.split('/').map(x=>x.trim().replace(/^(to |the )/,''));
-  const valClean=val.replace(/^(to |the )/,'');
-  const ok=alts.includes(valClean)||correct===val;
-  const inp=document.getElementById('vocabes-input'),fb=document.getElementById('vocabes-feedback'),btn=document.getElementById('vocabes-btn');
-  if(ok){vocabEsScore++;inp.classList.add('correct');fb.className='quiz-feedback correct';fb.textContent='✅ ¡Correcto!';}
-  else{vocabEsWrong.push(w);inp.classList.add('wrong');fb.className='quiz-feedback wrong';fb.innerHTML='❌ La respuesta es: <b>'+w.hint+'</b>';}
-  btn.textContent=vocabEsIndex<vocabEsQueue.length-1?'Siguiente →':'Resultados 🏆';btn.onclick=nextVocabEs;
-}
-
-function nextVocabEs(){vocabEsIndex++;if(vocabEsIndex>=vocabEsQueue.length)showVocabEsResults();else showVocabEsQuestion();}
-
-function showVocabEsResults(){
-  const total=vocabEsQueue.length,pct=Math.round(vocabEsScore/total*100);
-  const emoji=pct===100?'🏆':pct>=70?'🌟':pct>=40?'💪':'📚';
-  let wHTML='';
-  if(vocabEsWrong.length>0){wHTML='<div class="quiz-wrong-list"><b style="font-size:13px;color:#6b7280;">Para repasar:</b>';vocabEsWrong.forEach(w=>{wHTML+=`<div class="quiz-wrong-item">${w.es} → <b>${w.hint}</b></div>`;});wHTML+='</div>';}
-  document.getElementById('vocabes-counter').textContent='';
-  document.getElementById('vocabes-body').innerHTML=`<div class="quiz-score-card"><div style="font-size:48px">${emoji}</div><div class="quiz-score-big">${vocabEsScore}/${total}</div><div class="quiz-score-label">${pct>=70?'¡Muy bien!':'¡Sigue practicando!'} (${pct}%)</div>${wHTML}</div><button class="quiz-btn" style="background:linear-gradient(135deg,#f59e0b,#d97706)" onclick="startVocabEs()">🔄 Reiniciar</button><button class="quiz-btn pink" onclick="showScreen('screen-topics-es')" style="margin-top:8px;">← Temas</button>`;
-  savePracticeDay();
-}
-
-// ── SPANISH GRAMMAR QUIZ ──
-const GRAMMAR_ES=[
-  {type:"mc",topic:"Presente — ser/estar",question:"¿Cuál es correcto? 'Yo ___ estudiante.'",options:["estoy","soy","tengo","hay"],correct:1,explanation:"SER = identidad permanente (profesión, nacionalidad)"},
-  {type:"mc",topic:"Presente — ser/estar",question:"'Ella ___ cansada hoy.' ¿Qué verbo?",options:["es","tiene","está","hay"],correct:2,explanation:"ESTAR = estado temporal o emoción"},
-  {type:"mc",topic:"Presente — tener",question:"'Nosotros ___ un perro muy grande.'",options:["somos","estamos","tenemos","hay"],correct:2,explanation:"TENER = posesión"},
-  {type:"fill",topic:"Presente — regular -ar",before:"Yo",blank:"hablo",after:"español todos los días.",hint:"hablar → yo ?"},
-  {type:"fill",topic:"Presente — regular -er",before:"Ella",blank:"come",after:"pizza los viernes.",hint:"comer → ella ?"},
-  {type:"fill",topic:"Presente — irregular ir",before:"¿Adónde",blank:"vas",after:"tú esta tarde?",hint:"ir → tú ?"},
-  {type:"mc",topic:"Pretérito Indefinido",question:"'Ayer yo ___ al colegio en autobús.'",options:["voy","fui","iba","he ido"],correct:1,explanation:"Pretérito indefinido = acción pasada completa"},
-  {type:"mc",topic:"Pretérito Indefinido — irregular",question:"'El año pasado nosotros ___ a Madrid.'",options:["vamos","fuimos","íbamos","hemos ido"],correct:1,explanation:"ir → fui, fuiste, fue, fuimos, fuisteis, fueron"},
-  {type:"fill",topic:"Pretérito Indefinido — regular",before:"Ella",blank:"comió",after:"una pizza anoche.",hint:"comer → ella (pasado)"},
-  {type:"mc",topic:"Interrogativos",question:"'___ es tu asignatura favorita?'",options:["Quién","Cuándo","Cuál","Cómo"],correct:2,explanation:"CUÁL = which (para elegir entre opciones)"},
-  {type:"mc",topic:"Interrogativos",question:"'___ vives tú?'",options:["Qué","Dónde","Cuándo","Cómo"],correct:1,explanation:"DÓNDE = where"},
-  {type:"mc",topic:"Negación",question:"Forma negativa de 'Yo como carne.'",options:["Yo no como carne.","Yo nunca como carne.","Yo no comer carne.","Yo no comgo carne."],correct:0,explanation:"NO va siempre antes del verbo"},
-  {type:"fill",topic:"Gustar",before:"A mí me",blank:"gusta",after:"mucho la música.",hint:"gustar → singular"},
-  {type:"mc",topic:"Gustar",question:"'A ellos ___ los deportes.'",options:["gusta","gustan","gusto","gustas"],correct:1,explanation:"GUSTAN porque 'los deportes' es plural"},
-  {type:"mc",topic:"Hay / Está",question:"'___ un mercado cerca de mi casa.'",options:["Está","Es","Hay","Tiene"],correct:2,explanation:"HAY = existe/hay (existencia). ESTÁ = dónde está (ubicación)"},
-];
-
-let gramEsQueue=[],gramEsIndex=0,gramEsScore=0,gramEsWrong=[],gramEsAnswered=false;
-function startGrammarEs(){gramEsQueue=[...GRAMMAR_ES].sort(()=>Math.random()-0.5);gramEsIndex=0;gramEsScore=0;gramEsWrong=[];showGramEsQuestion();}
-function showGramEsQuestion(){
-  gramEsAnswered=false;
-  const q=gramEsQueue[gramEsIndex],total=gramEsQueue.length;
-  document.getElementById('grames-counter').textContent=(gramEsIndex+1)+' / '+total;
-  const pct=(gramEsIndex/total*100)+'%';
-  let bHTML=`<div class="quiz-progress" style="width:100%;max-width:440px;"><div class="quiz-progress-bar" style="width:${pct};background:linear-gradient(90deg,#f59e0b,#d97706);"></div></div><div class="grammar-card" style="border-color:#fcd34d;"><div class="grammar-type" style="color:#d97706;">${q.topic}</div>`;
-  if(q.type==='mc'){
-    bHTML+=`<div class="grammar-question">${q.question}</div><div class="mc-options">`;
-    q.options.forEach((opt,i)=>{bHTML+=`<button class="mc-btn" id="gmes-${i}" onclick="checkGramEs(${i})" style="border-color:#fcd34d;">${opt}</button>`;});
-    bHTML+=`</div>`;
-  }else{
-    bHTML+=`<div class="grammar-question">Completa: <span style="color:#9ca3af;font-size:13px;">(${q.hint})</span></div><div class="fill-row" style="font-size:16px;font-weight:700;color:#451a03;"><span>${q.before}</span><input class="fill-input" id="gmes-fill" placeholder="..." autocomplete="off" autocorrect="off" spellcheck="false" onkeydown="gramEsKey(event)" style="width:130px;border-color:#fcd34d;"/><span>${q.after}</span></div>`;
-  }
-  bHTML+=`<div class="grammar-feedback" id="gmes-feedback"></div><div class="grammar-explanation" id="gmes-explanation"></div></div><button class="quiz-btn" id="gmes-btn" style="background:linear-gradient(135deg,#f59e0b,#d97706);box-shadow:0 4px 14px rgba(217,119,6,0.35);" onclick="${q.type==='mc'?'':'checkGramEsFill()'}">Comprobar ✓</button>`;
-  document.getElementById('grames-body').innerHTML=bHTML;
-  if(q.type==='fill')setTimeout(()=>{const i=document.getElementById('gmes-fill');if(i)i.focus();},100);
-}
-function gramEsKey(e){if(e.key==='Enter'){if(!gramEsAnswered)checkGramEsFill();else nextGramEs();}}
-function checkGramEs(chosen){
-  if(gramEsAnswered)return; gramEsAnswered=true;
-  const q=gramEsQueue[gramEsIndex];
-  q.options.forEach((_,i)=>{const el=document.getElementById('gmes-'+i);if(i===q.correct)el.classList.add('show-correct');else if(i===chosen&&chosen!==q.correct)el.classList.add('wrong');el.disabled=true;});
-  const fb=document.getElementById('gmes-feedback'),ex=document.getElementById('gmes-explanation'),btn=document.getElementById('gmes-btn');
-  if(chosen===q.correct){gramEsScore++;fb.className='grammar-feedback correct';fb.textContent='✅ ¡Correcto!';}
-  else{gramEsWrong.push(q);fb.className='grammar-feedback wrong';fb.textContent='❌ ¡Respuesta incorrecta!';}
-  if(q.explanation)ex.textContent='💡 '+q.explanation;
-  btn.textContent=gramEsIndex<gramEsQueue.length-1?'Siguiente →':'Resultados 🏆';btn.onclick=nextGramEs;
-}
-function checkGramEsFill(){
-  if(gramEsAnswered)return; gramEsAnswered=true;
-  const q=gramEsQueue[gramEsIndex],inp=document.getElementById('gmes-fill');
-  const val=inp.value.trim().toLowerCase(),correct=q.blank.toLowerCase();
-  const ok=correct.split('/').map(x=>x.trim()).includes(val);
-  const fb=document.getElementById('gmes-feedback'),ex=document.getElementById('gmes-explanation'),btn=document.getElementById('gmes-btn');
-  if(ok){gramEsScore++;inp.classList.add('correct');fb.className='grammar-feedback correct';fb.textContent='✅ ¡Correcto!';}
-  else{gramEsWrong.push(q);inp.classList.add('wrong');fb.className='grammar-feedback wrong';fb.innerHTML='❌ Respuesta: <b>'+q.blank+'</b>';}
-  if(q.explanation)ex.textContent='💡 '+q.explanation;
-  btn.textContent=gramEsIndex<gramEsQueue.length-1?'Siguiente →':'Resultados 🏆';btn.onclick=nextGramEs;
-}
-function nextGramEs(){gramEsIndex++;if(gramEsIndex>=gramEsQueue.length)showGramEsResults();else showGramEsQuestion();}
-function showGramEsResults(){
-  const total=gramEsQueue.length,pct=Math.round(gramEsScore/total*100);
-  const emoji=pct===100?'🏆':pct>=70?'🌟':pct>=40?'💪':'📚';
-  let wHTML='';
-  if(gramEsWrong.length>0){wHTML='<div class="quiz-wrong-list"><b style="font-size:13px;color:#6b7280;">Para repasar:</b>';gramEsWrong.forEach(q=>{wHTML+=`<div class="quiz-wrong-item"><span>${q.topic}</span></div>`;});wHTML+='</div>';}
-  document.getElementById('grames-counter').textContent='';
-  document.getElementById('grames-body').innerHTML=`<div class="quiz-score-card"><div style="font-size:48px">${emoji}</div><div class="quiz-score-big">${gramEsScore}/${total}</div><div class="quiz-score-label">${pct>=70?'¡Muy bien!':'¡Sigue practicando!'} (${pct}%)</div>${wHTML}</div><button class="quiz-btn" style="background:linear-gradient(135deg,#f59e0b,#d97706)" onclick="startGrammarEs()">🔄 Reiniciar</button><button class="quiz-btn pink" onclick="showScreen('screen-topics-es')" style="margin-top:8px;">← Temas</button>`;
-  savePracticeDay();
-}
-
-// Hook showScreen for new screens
-const _prevShowScreen3=window.showScreen;
-window.showScreen=function(id){
-  _prevShowScreen3(id);
-  if(id==='screen-reading-en'){readingFromLang='en';startReading('en');}
-  if(id==='screen-reading-es'){readingFromLang='es';startReading('es');}
-  if(id==='screen-vocabquiz-es') startVocabEs();
-  if(id==='screen-grammarquiz-es') startGrammarEs();
-};
 
 // ── TRANSLATION ──
 async function translateMsg(text, container) {
@@ -1613,7 +1067,7 @@ async function translateMsg(text, container) {
 <div id="screen-quiz" class="screen">
   <div class="quiz-shell">
     <div class="quiz-topbar">
-      <button class="back-btn" onclick="showScreen('screen-topics-en')">← Topics</button>
+      <button class="back-btn" onclick="showScreen('screen-topics')">← Topics</button>
       <span style="font-weight:800;color:#059669;font-size:15px;">🎯 Vocabulary Quiz</span>
       <span id="quiz-counter" style="font-weight:800;color:#6ee7b7;font-size:13px;"></span>
     </div>
@@ -1628,7 +1082,7 @@ async function translateMsg(text, container) {
 <div id="screen-verbquiz" class="screen">
   <div class="quiz-shell">
     <div class="quiz-topbar">
-      <button class="back-btn" onclick="showScreen('screen-topics-en')">← Topics</button>
+      <button class="back-btn" onclick="showScreen('screen-topics')">← Topics</button>
       <span style="font-weight:800;color:#059669;font-size:15px;">🔤 Irregular Verbs</span>
       <span id="verbquiz-counter" style="font-weight:800;color:#6ee7b7;font-size:13px;"></span>
     </div>
@@ -1639,59 +1093,11 @@ async function translateMsg(text, container) {
 <div id="screen-grammarquiz" class="screen">
   <div class="quiz-shell">
     <div class="quiz-topbar">
-      <button class="back-btn" onclick="showScreen('screen-topics-en')">← Topics</button>
+      <button class="back-btn" onclick="showScreen('screen-topics')">← Topics</button>
       <span style="font-weight:800;color:#ea580c;font-size:15px;">📝 Grammar Exercises</span>
       <span id="grammar-counter" style="font-weight:800;color:#fdba74;font-size:13px;"></span>
     </div>
     <div class="quiz-body" id="grammarquiz-body"></div>
-  </div>
-</div>
-
-<!-- READING EN -->
-<div id="screen-reading-en" class="screen">
-  <div class="quiz-shell">
-    <div class="quiz-topbar">
-      <button class="back-btn" onclick="goBackFromReading()">← Back</button>
-      <span style="font-weight:800;color:#2563eb;font-size:15px;">📖 Reading Comprehension</span>
-      <span id="reading-en-counter" style="font-weight:800;color:#93c5fd;font-size:13px;"></span>
-    </div>
-    <div class="quiz-body" id="reading-en-body"></div>
-  </div>
-</div>
-
-<!-- READING ES -->
-<div id="screen-reading-es" class="screen">
-  <div class="quiz-shell shell-es">
-    <div class="quiz-topbar topbar-es">
-      <button class="back-btn back-btn-es" onclick="showScreen('screen-topics-es')">← Atrás</button>
-      <span style="font-weight:800;color:#92400e;font-size:15px;">📖 Comprensión Lectora</span>
-      <span id="reading-es-counter" style="font-weight:800;color:#fcd34d;font-size:13px;"></span>
-    </div>
-    <div class="quiz-body" id="reading-es-body"></div>
-  </div>
-</div>
-
-<!-- VOCAB ES -->
-<div id="screen-vocabquiz-es" class="screen">
-  <div class="quiz-shell shell-es">
-    <div class="quiz-topbar topbar-es">
-      <button class="back-btn back-btn-es" onclick="showScreen('screen-topics-es')">← Atrás</button>
-      <span style="font-weight:800;color:#92400e;font-size:15px;">🎯 Vocabulario</span>
-      <span id="vocabes-counter" style="font-weight:800;color:#fcd34d;font-size:13px;"></span>
-    </div>
-    <div class="quiz-body" id="vocabes-body"></div>
-  </div>
-</div>
-
-<!-- GRAMMAR ES -->
-<div id="screen-grammarquiz-es" class="screen">
-  <div class="quiz-shell shell-es">
-    <div class="quiz-topbar topbar-es">
-      <button class="back-btn back-btn-es" onclick="showScreen('screen-topics-es')">← Atrás</button>
-      <span style="font-weight:800;color:#92400e;font-size:15px;">📝 Gramática</span>
-      <span id="grames-counter" style="font-weight:800;color:#fcd34d;font-size:13px;"></span>
-    </div>
-    <div class="quiz-body" id="grames-body"></div>
   </div>
 </div>
 
