@@ -130,146 +130,19 @@ body {
 ::-webkit-scrollbar { width:5px; }
 ::-webkit-scrollbar-thumb { background:#86efac; border-radius:10px; }
 
-/* ── QUIZ ── */
-.quiz-shell {
-  width:100%; height:calc(100vh - 40px);
-  background:rgba(255,255,255,0.96); border-radius:28px;
-  box-shadow:0 16px 56px rgba(20,160,100,0.14);
-  display:flex; flex-direction:column; overflow:hidden;
-  border:1.5px solid rgba(134,239,172,0.45);
+.v2-input {
+  border:2px solid #ddd6fe; border-radius:10px; padding:9px 13px;
+  font-size:15px; font-family:'Nunito',sans-serif; font-weight:700;
+  outline:none; color:#1f2937; transition:border .2s;
 }
-.quiz-topbar {
-  display:flex; align-items:center; justify-content:space-between;
-  padding:12px 16px; border-bottom:1.5px solid #bbf7d0;
-  background:rgba(240,253,248,0.95); flex-shrink:0;
-}
-.quiz-body {
-  flex:1; display:flex; flex-direction:column;
-  align-items:center; justify-content:center;
-  padding:24px 20px; gap:20px; overflow-y:auto;
-}
-.quiz-progress {
-  width:100%; max-width:400px;
-  height:8px; background:#d1fae5; border-radius:10px; overflow:hidden;
-}
-.quiz-progress-bar {
-  height:100%; background:linear-gradient(90deg,#34d399,#059669);
-  border-radius:10px; transition:width .4s ease;
-}
-.quiz-card {
-  background:white; border-radius:24px; padding:32px 28px;
-  text-align:center; width:100%; max-width:400px;
-  box-shadow:0 8px 32px rgba(0,0,0,0.08);
-  border:2px solid #bbf7d0;
-}
-.quiz-label { font-size:13px; font-weight:800; color:#6ee7b7; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }
-.quiz-word { font-family:"Baloo 2",cursive; font-size:32px; color:#065f46; margin-bottom:4px; }
-.quiz-hint { font-size:13px; color:#9ca3af; margin-bottom:20px; }
-.quiz-input {
-  width:100%; border:2px solid #bbf7d0; border-radius:14px;
-  padding:14px 18px; font-size:18px; font-family:"Nunito",sans-serif;
-  font-weight:700; outline:none; color:#065f46; text-align:center;
-  transition:border .2s;
-}
-.quiz-input:focus { border-color:#34d399; }
-.quiz-input.correct { border-color:#22c55e; background:#f0fdf4; color:#15803d; }
-.quiz-input.wrong   { border-color:#f87171; background:#fef2f2; color:#dc2626; }
-.quiz-feedback {
-  font-size:15px; font-weight:800; min-height:24px; margin-top:4px;
-}
-.quiz-feedback.correct { color:#15803d; }
-.quiz-feedback.wrong   { color:#dc2626; }
-.quiz-btn {
-  background:linear-gradient(135deg,#34d399,#059669); color:white;
-  border:none; border-radius:16px; padding:14px 36px;
-  font-size:18px; font-weight:900; font-family:"Nunito",sans-serif;
-  cursor:pointer; box-shadow:0 4px 14px rgba(5,150,105,0.35);
-  transition:transform .15s; width:100%; max-width:400px;
-}
-.quiz-btn:hover { transform:scale(1.02); }
-.quiz-btn.pink {
-  background:linear-gradient(135deg,#f472b6,#ec4899);
-  box-shadow:0 4px 14px rgba(236,72,153,0.35);
-}
-.quiz-score-card {
-  background:white; border-radius:24px; padding:36px 28px;
-  text-align:center; width:100%; max-width:400px;
-  box-shadow:0 8px 32px rgba(0,0,0,0.08); border:2px solid #bbf7d0;
-}
-.quiz-score-big { font-family:"Baloo 2",cursive; font-size:64px; color:#059669; line-height:1; }
-.quiz-score-label { font-size:16px; font-weight:700; color:#6b7280; margin:8px 0 20px; }
-.quiz-wrong-list { text-align:left; margin-top:16px; }
-.quiz-wrong-item { font-size:14px; color:#6b7280; padding:6px 0; border-bottom:1px solid #f0fdf4; font-weight:600; }
-.quiz-wrong-item span { color:#dc2626; }
-.quiz-wrong-item b { color:#059669; }
-
-/* ── CALENDAR ── */
-.calendar-wrap {
-  width:100%; max-width:380px; margin:20px auto 0;
-  background:rgba(255,255,255,0.7); border-radius:20px;
-  padding:16px 20px; border:1.5px solid #bbf7d0;
-  box-shadow:0 4px 16px rgba(20,160,100,0.08);
-}
-.calendar-header {
-  display:flex; align-items:center; justify-content:space-between;
-  margin-bottom:12px;
-}
-.calendar-header h3 { font-family:"Baloo 2",cursive; font-size:16px; color:#059669; }
-.cal-nav { background:none; border:none; cursor:pointer; font-size:18px; color:#059669; padding:2px 6px; }
-.cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; }
-.cal-dayname { font-size:10px; font-weight:800; color:#6ee7b7; text-align:center; padding:2px 0; }
-.cal-day {
-  aspect-ratio:1; border-radius:50%; display:flex; align-items:center;
-  justify-content:center; font-size:11px; font-weight:700; color:#6b7280;
-  cursor:default;
-}
-.cal-day.practiced {
-  background:linear-gradient(135deg,#34d399,#059669);
-  color:white; box-shadow:0 2px 6px rgba(5,150,105,0.3);
-}
-.cal-day.today { border:2px solid #f472b6; color:#e8619a; }
-.cal-day.today.practiced { border:2px solid white; }
-.cal-day.empty { opacity:0; }
-.cal-streak { text-align:center; margin-top:10px; font-size:12px; font-weight:800; color:#059669; }
-
-/* ── TRANSLATE BUTTON ── */
-.translate-btn {
-  background:none; border:none; cursor:pointer; font-size:16px;
-  padding:2px 4px; opacity:0.7; transition:opacity .15s;
-  vertical-align:middle; margin-left:4px;
-}
-.translate-btn:hover { opacity:1; }
-.translation-bubble {
-  background:#fef9c3; border:1.5px solid #fde047;
-  border-radius:10px; padding:6px 12px; font-size:13px;
-  font-weight:700; color:#854d0e; margin-top:4px;
-  display:inline-block; max-width:100%;
-}
-.mic-btn {
-  width:46px; height:46px; border-radius:13px; border:2px solid #fbcfe8;
-  font-size:20px; cursor:pointer; transition:all .2s; flex-shrink:0;
-  background:#fce7f3; display:flex; align-items:center; justify-content:center;
-}
-.mic-btn.listening {
-  background:#f472b6; border-color:#f472b6;
-  box-shadow: 0 0 0 5px rgba(244,114,182,0.25);
-}
-.sound-banner {
-  position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
-  background:linear-gradient(135deg,#34d399,#059669); color:white;
-  border:none; border-radius:20px; padding:12px 28px;
-  font-size:16px; font-weight:800; font-family:"Nunito",sans-serif;
-  cursor:pointer; box-shadow:0 6px 20px rgba(5,150,105,0.4);
-  z-index:999; animation:floatUp .4s ease both;
-}
+.v2-input:focus { border-color:#7c3aed; }
+.v2-input.correct { border-color:#22c55e !important; background:#f0fdf4; color:#15803d; }
+.v2-input.wrong { border-color:#f87171 !important; background:#fef2f2; color:#dc2626; }
 </style>
 </head>
 <body>
 
 <!-- WELCOME -->
-<!-- Sound unlock banner -->
-<button class="sound-banner" id="sound-banner" onclick="unlockAudio()">🔊 Tap to enable sound!</button>
-
 <div id="screen-welcome" class="screen active">
   <div class="welcome-card">
     <div class="lily-wrap" style="margin:0 auto;">
@@ -280,16 +153,6 @@ body {
     <h1>Hi! I'm Lily! 🌟</h1>
     <p>Your friendly English teacher.<br/>Let's practise together!</p>
     <button class="primary-btn" onclick="showTopics()">Let's start! ✨</button>
-  </div>
-  <!-- CALENDAR -->
-  <div class="calendar-wrap">
-    <div class="calendar-header">
-      <button class="cal-nav" onclick="calPrev()">‹</button>
-      <h3 id="cal-title"></h3>
-      <button class="cal-nav" onclick="calNext()">›</button>
-    </div>
-    <div class="cal-grid" id="cal-grid"></div>
-    <div class="cal-streak" id="cal-streak"></div>
   </div>
 </div>
 
@@ -302,9 +165,11 @@ body {
       </div>
       <h2>What do you want to talk about? 🌸</h2>
     </div>
-    <button class="quiz-btn pink" onclick="showScreen('screen-quiz')" style="margin-bottom:14px;font-size:16px;padding:12px 24px;">
-      🎯 Vocabulary Quiz — Housework
-    </button>
+    <div style="display:flex;flex-direction:column;gap:8px;width:100%;margin-bottom:14px;">
+      <button class="quiz-btn" onclick="showScreen('screen-verifica2')" style="font-size:16px;padding:13px 20px;background:linear-gradient(135deg,#7c3aed,#4c1d95);">
+        📋 Verifica 2 — Have to / Must / Like+ing
+      </button>
+    </div>
     <div class="topic-grid" id="topic-grid"></div>
   </div>
 </div>
@@ -329,8 +194,7 @@ body {
       <div class="msg-col" id="msg-col"></div>
     </div>
     <div class="chat-inputbar">
-      <button class="mic-btn" id="mic-btn" onclick="toggleMic()" title="Speak">🎤</button>
-      <input id="chat-input" type="text" placeholder="Write or speak… ✍️🎤" onkeydown="handleKey(event)"/>
+      <input id="chat-input" type="text" placeholder="Write in English… ✍️" onkeydown="handleKey(event)"/>
       <button class="send-btn" id="send-btn" onclick="sendMsg()" disabled>➤</button>
     </div>
   </div>
@@ -362,9 +226,7 @@ STRICT LANGUAGE RULES:
 - Always add one short encouragement: "Great!", "Well done!", "Good job!", "Excellent!".
 - Use 1-2 emojis per reply to feel warm.
 
-STRICT TOPIC RULE: Only discuss the chosen topic and English practice. If asked anything off-topic, reply: "Let's keep practising English! 😊" and redirect.
-
-CORRECTION RULE: When the student makes a grammar or vocabulary mistake, always add at the end of your reply on a new line: "💡 Did you mean: [correct version]?" For example if they write "I have went" add "💡 Did you mean: I went?"`;
+STRICT TOPIC RULE: Only discuss the chosen topic and English practice. If asked anything off-topic, reply: "Let's keep practising English! 😊" and redirect.`;
 
 // ── TOPICS ──
 const TOPICS = [
@@ -495,400 +357,168 @@ document.getElementById('chat-input').addEventListener('input', e => {
   document.getElementById('send-btn').disabled = !e.target.value.trim() || loading;
 });
 
-// ── AUDIO UNLOCK ──
-let audioUnlocked = false;
-function unlockAudio() {
-  audioUnlocked = true;
-  document.getElementById('sound-banner').style.display = 'none';
-  // warm up speech synthesis
-  const u = new SpeechSynthesisUtterance('');
-  window.speechSynthesis.speak(u);
+// ── showScreen utility ──
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+  var el = document.getElementById(id);
+  if(el) el.classList.add('active');
+  if(id==='screen-verifica2') startV2Quiz();
 }
 
-// ── SPEECH SYNTHESIS — Lily speaks ──
-function speak(text) {
-  if (!audioUnlocked || !window.speechSynthesis) return;
-  window.speechSynthesis.cancel();
-  const clean = text.replace(/[^ -]/g, ' ').replace(/\s+/g,' ').trim();
-  const utt = new SpeechSynthesisUtterance(clean);
-  utt.lang  = 'en-GB';
-  utt.rate  = 0.88;
-  utt.pitch = 1.15;
-  // pick a female voice if available
-  const voices = window.speechSynthesis.getVoices();
-  const voice = voices.find(v => v.lang === 'en-GB' && /female|zira|hazel|susan|karen|moira/i.test(v.name))
-             || voices.find(v => v.lang === 'en-GB')
-             || voices.find(v => v.lang.startsWith('en'));
-  if (voice) utt.voice = voice;
-  utt.onstart = () => { if (anim_chat) anim_chat.setSpeed(1.4); };
-  utt.onend   = () => { if (anim_chat) anim_chat.setSpeed(1); };
-  window.speechSynthesis.speak(utt);
-}
-
-// load voices async (Chrome needs this)
-window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
-
-// ── SPEECH RECOGNITION — Zoe speaks ──
-const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-let recognition = null;
-let isListening = false;
-
-if (SpeechRecognition) {
-  recognition = new SpeechRecognition();
-  recognition.lang = 'en-US';
-  recognition.continuous = false;
-  recognition.interimResults = false;
-
-  recognition.onresult = e => {
-    const transcript = e.results[0][0].transcript;
-    document.getElementById('chat-input').value = transcript;
-    document.getElementById('send-btn').disabled = false;
-    stopListening();
-    // auto-send after 600ms
-    setTimeout(sendMsg, 600);
-  };
-  recognition.onerror = () => stopListening();
-  recognition.onend   = () => stopListening();
-}
-
-function toggleMic() {
-  if (!recognition) {
-    alert('Voice not supported in this browser. Try Chrome!');
-    return;
-  }
-  if (isListening) stopListening();
-  else startListening();
-}
-
-function startListening() {
-  isListening = true;
-  document.getElementById('mic-btn').classList.add('listening');
-  document.getElementById('mic-btn').textContent = '⏹';
-  document.getElementById('chat-input').placeholder = 'Listening… 👂';
-  recognition.start();
-}
-
-function stopListening() {
-  isListening = false;
-  document.getElementById('mic-btn').classList.remove('listening');
-  document.getElementById('mic-btn').textContent = '🎤';
-  document.getElementById('chat-input').placeholder = 'Write or speak… ✍️🎤';
-  try { recognition.stop(); } catch(e) {}
-}
-
-// patch addBubble to speak Lily messages
-const _origFetchLily = fetchLily;
-// intercept Lily replies to trigger speech
-const _origAddBubble = addBubble;
-window.addBubble = function(who, text) {
-  _origAddBubble(who, text);
-  if (who === 'lily') speak(text);
-};
-// override global
-window.addBubble = function(who, text) {
-  const col = document.getElementById("msg-col");
-  const wrap = document.createElement("div");
-  wrap.style.cssText = "display:flex;flex-direction:column;align-items:" + (who==="user"?"flex-end":"flex-start");
-  const row = document.createElement("div");
-  row.style.cssText = "display:flex;align-items:flex-end;gap:4px;justify-content:" + (who==="user"?"flex-end":"flex-start");
-  const b = document.createElement("div");
-  b.className = who === "user" ? "bubble-user" : "bubble-lily";
-  b.textContent = text;
-  row.appendChild(b);
-  if (who === "lily") {
-    const btn = document.createElement("button");
-    btn.className = "translate-btn";
-    btn.textContent = "🇮🇹";
-    btn.title = "Traduci in italiano";
-    btn.onclick = () => translateMsg(text, wrap);
-    row.appendChild(btn);
-  }
-  wrap.appendChild(row);
-  col.appendChild(wrap);
-  col.scrollTop = col.scrollHeight;
-  if (who === "lily") speak(text);
-  // save practice day
-  savePracticeDay();
-};
-
-// ── CALENDAR ──
-let calYear, calMonth;
-const PRACTICED_KEY = "lily_practiced_days";
-
-function getPracticedDays() {
-  try { return JSON.parse(localStorage.getItem(PRACTICED_KEY) || "[]"); }
-  catch(e) { return []; }
-}
-
-function savePracticeDay() {
-  const days = getPracticedDays();
-  const today = new Date().toISOString().slice(0,10);
-  if (!days.includes(today)) {
-    days.push(today);
-    localStorage.setItem(PRACTICED_KEY, JSON.stringify(days));
-    renderCalendar();
-  }
-}
-
-function renderCalendar() {
-  const now = new Date();
-  if (calYear === undefined) { calYear = now.getFullYear(); calMonth = now.getMonth(); }
-  const days = getPracticedDays();
-  const todayStr = now.toISOString().slice(0,10);
-  const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-  document.getElementById("cal-title").textContent = months[calMonth] + " " + calYear;
-  const grid = document.getElementById("cal-grid");
-  grid.innerHTML = "";
-  // day names
-  ["Mo","Tu","We","Th","Fr","Sa","Su"].forEach(d => {
-    const el = document.createElement("div");
-    el.className = "cal-dayname"; el.textContent = d;
-    grid.appendChild(el);
-  });
-  const firstDay = new Date(calYear, calMonth, 1).getDay();
-  const offset = (firstDay + 6) % 7; // Monday first
-  const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
-  for (let i = 0; i < offset; i++) {
-    const el = document.createElement("div"); el.className = "cal-day empty"; grid.appendChild(el);
-  }
-  for (let d = 1; d <= daysInMonth; d++) {
-    const el = document.createElement("div");
-    el.className = "cal-day";
-    el.textContent = d;
-    const dateStr = calYear + "-" + String(calMonth+1).padStart(2,"0") + "-" + String(d).padStart(2,"0");
-    if (days.includes(dateStr)) el.classList.add("practiced");
-    if (dateStr === todayStr) el.classList.add("today");
-    grid.appendChild(el);
-  }
-  // streak
-  let streak = 0;
-  const check = new Date();
-  while(true) {
-    const s = check.toISOString().slice(0,10);
-    if (days.includes(s)) { streak++; check.setDate(check.getDate()-1); }
-    else break;
-  }
-  const streakEl = document.getElementById("cal-streak");
-  if (streak > 0) streakEl.textContent = "🔥 " + streak + " day streak! Keep it up!";
-  else streakEl.textContent = "Start your streak today! 💪";
-}
-
-function calPrev() { calMonth--; if(calMonth<0){calMonth=11;calYear--;} renderCalendar(); }
-function calNext() { calMonth++; if(calMonth>11){calMonth=0;calYear++;} renderCalendar(); }
-
-// init calendar on load
-window.addEventListener("load", () => { setTimeout(renderCalendar, 500); });
-
-// ── VOCABULARY QUIZ ──
-const WORDS = [
-  { it: "bidone",                              en: "bin" },
-  { it: "scopa",                               en: "broom" },
-  { it: "secchio",                             en: "bucket" },
-  { it: "pulire il bagno",                     en: "clean the bathroom" },
-  { it: "panno da cucina / strofinaccio",      en: "dishcloth" },
-  { it: "piatti",                              en: "dishes" },
-  { it: "cucinare / far da mangiare",          en: "do the cooking" },
-  { it: "spolverare",                          en: "do the dusting" },
-  { it: "stirare",                             en: "do the ironing" },
-  { it: "passare l'aspirapolvere",             en: "do the vacuuming" },
-  { it: "fare il bucato",                      en: "do the washing" },
-  { it: "lavare i piatti / rigovernare",       en: "do the washing-up" },
-  { it: "asciugare i piatti",                  en: "dry the dishes" },
-  { it: "piumino / panno da spolvero",         en: "duster" },
-  { it: "dar da mangiare al cane",             en: "feed the dog" },
-  { it: "ferro da stiro",                      en: "iron" },
-  { it: "asse da stiro",                       en: "ironing board" },
-  { it: "apparecchiare / sparecchiare la tavola", en: "lay/clear the table" },
-  { it: "caricare / scaricare la lavastoviglie",  en: "load/unload the dishwasher" },
-  { it: "fare il letto",                       en: "make my bed" },
-  { it: "mocio",                               en: "mop" },
-  { it: "passare lo straccio sul pavimento",   en: "mop the floor" },
-  { it: "mettere via",                         en: "put something away" },
-  { it: "portare fuori la spazzatura",         en: "put the rubbish out" },
-  { it: "spazzare il pavimento",               en: "sweep the floor" },
-  { it: "salvietta / canovaccio",              en: "tea towel" },
-  { it: "riordinare la stanza",                en: "tidy my room" },
-  { it: "mettere in ordine",                   en: "tidy up" },
-  { it: "aspirapolvere",                       en: "vacuum cleaner" },
-  { it: "lavare i piatti",                     en: "wash the dishes" },
+// ══ VERIFICA 2 ══
+var V2_POOL = [
+  {topic:"have to — Affirmative",instruction:"Complete with have to or has to.",before:"She",blank:"has to",after:"tidy her room every day.",rule:"he/she/it → has to | I/you/we/they → have to",example:"She has to wake up early. / We have to study."},
+  {topic:"have to — Affirmative",instruction:"Complete with have to or has to.",before:"We",blank:"have to",after:"wear a uniform at school.",rule:"I/you/we/they → have to | he/she/it → has to",example:"We have to be quiet. / She has to cook."},
+  {topic:"have to — Affirmative",instruction:"Complete with have to or has to.",before:"My dad",blank:"has to",after:"work on Saturdays.",rule:"he/she/it → has to. Terza persona singolare!",example:"My mum has to cook dinner."},
+  {topic:"have to — Affirmative",instruction:"Complete with have to or has to.",before:"I",blank:"have to",after:"do the washing-up tonight.",rule:"I → have to",example:"I have to go now."},
+  {topic:"have to — Affirmative",instruction:"Complete with have to or has to.",before:"They",blank:"have to",after:"be at school by 8.30.",rule:"they → have to",example:"They have to follow the rules."},
+  {topic:"have to — Negative",instruction:"Complete with don't have to or doesn't have to.",before:"You",blank:"don't have to",after:"do the ironing. Mum will do it.",rule:"I/you/we/they → don't have to | Non è necessario.",example:"We don't have to go on Sunday."},
+  {topic:"have to — Negative",instruction:"Complete with don't have to or doesn't have to.",before:"She",blank:"doesn't have to",after:"cook tonight. Dad will do it.",rule:"he/she/it → doesn't have to | Non è necessario.",example:"She doesn't have to wake up early."},
+  {topic:"have to — Negative",instruction:"Complete with don't have to or doesn't have to.",before:"They",blank:"don't have to",after:"pay. It's free!",rule:"they → don't have to",example:"They don't have to study tonight."},
+  {topic:"have to — Negative",instruction:"Complete with don't have to or doesn't have to.",before:"He",blank:"doesn't have to",after:"take the bus. He walks.",rule:"he → doesn't have to | NOT 'he don't have to'!",example:"He doesn't have to go to the dentist."},
+  {topic:"have to — Negative",instruction:"Complete with don't have to or doesn't have to.",before:"We",blank:"don't have to",after:"be at school before 8.30.",rule:"we → don't have to",example:"We don't have to wear uniform at weekends."},
+  {topic:"have to — Interrogative",instruction:"Write Do or Does.",before:"",blank:"Does",after:"she have to tidy her room today?",rule:"Does he/she/it have to? | Do I/you/we/they have to?",example:"Does he have to do homework? / Do you have to go?"},
+  {topic:"have to — Interrogative",instruction:"Write Do or Does.",before:"",blank:"Do",after:"they have to pay for the tickets?",rule:"Do I/you/we/they have to?",example:"Do we have to bring our books?"},
+  {topic:"have to — Interrogative",instruction:"Write Do or Does.",before:"",blank:"Does",after:"your brother have to walk to school?",rule:"Does he/she/it have to + base verb?",example:"Does your mum have to work today?"},
+  {topic:"have to — Interrogative",instruction:"Turn into a question. Write the full sentence.",before:"You have to do the washing-up.",blank:"Do you have to do the washing-up?",after:"",rule:"Do + subject + have to + base verb + ?",example:"She has to tidy → Does she have to tidy?"},
+  {topic:"have to — Interrogative",instruction:"Turn into a question. Write the full sentence.",before:"He has to feed the dog.",blank:"Does he have to feed the dog?",after:"",rule:"Does + subject + have to + base verb + ?",example:"We have to leave → Do we have to leave?"},
+  {topic:"have to — Short answers",instruction:"Write the short answer (affirmative).",before:"Does she have to clean the bathroom?",blank:"Yes, she does.",after:"",rule:"Affirmative: Yes, + pronoun + do/does.",example:"Do you have to go? Yes, I do."},
+  {topic:"have to — Short answers",instruction:"Write the short answer (negative).",before:"Do they have to pay?",blank:"No, they don't.",after:"",rule:"Negative: No, + pronoun + don't/doesn't.",example:"Does he have to study? No, he doesn't."},
+  {topic:"have to — Short answers",instruction:"Write the short answer (affirmative).",before:"Do you have to tidy your room?",blank:"Yes, I do.",after:"",rule:"Yes, + pronoun + do. (I/you/we/they)",example:"Do you have to help? Yes, I do."},
+  {topic:"have to — Short answers",instruction:"Write the short answer (negative).",before:"Does he have to wear a uniform?",blank:"No, he doesn't.",after:"",rule:"No, + pronoun + doesn't. (he/she/it)",example:"Does she have to cook? No, she doesn't."},
+  {topic:"have to — Short answers",instruction:"Write the short answer (affirmative).",before:"Does your mum have to work today?",blank:"Yes, she does.",after:"",rule:"Yes, she does. (he/she/it → does)",example:"Does he have to go? Yes, he does."},
+  {topic:"must",instruction:"Complete with must.",before:"You",blank:"must",after:"be quiet in the library.",rule:"MUST: stessa forma per tutte le persone. Must = obbligo forte.",example:"You must do your homework. / She must be careful."},
+  {topic:"must",instruction:"Complete with must.",before:"Students",blank:"must",after:"turn off their phones in class.",rule:"MUST: no s alla terza persona! He must (NOT he musts).",example:"Everyone must follow the rules."},
+  {topic:"must",instruction:"Complete with mustn't.",before:"You",blank:"mustn't",after:"use your phone during the test.",rule:"MUSTN'T = è vietato! | mustn't = divieto / don't have to = non necessario",example:"You mustn't run in the corridors."},
+  {topic:"like + -ing",instruction:"Write the correct -ing form of the verb.",before:"She likes",blank:"dancing",after:"at weekends.",rule:"LIKE + -ing. dance → dancing (rimuovi la -e finale!)",example:"I like swimming. / She likes reading."},
+  {topic:"like + -ing",instruction:"Write the correct -ing form of the verb.",before:"I love",blank:"swimming",after:"in the sea.",rule:"swim → swimming (CVC: raddoppia consonante finale!)",example:"He loves swimming."},
+  {topic:"like + -ing",instruction:"Write the correct -ing form of the verb.",before:"They enjoy",blank:"playing",after:"video games after school.",rule:"play → playing (aggiungi solo -ing)",example:"They enjoy playing football."},
+  {topic:"like + -ing",instruction:"Write the correct -ing form of the verb.",before:"My brother hates",blank:"tidying",after:"his room.",rule:"tidy → tidying (la -y rimane, aggiungi solo -ing)",example:"He hates doing homework."},
+  {topic:"like + -ing",instruction:"Write the correct -ing form of the verb.",before:"She doesn't like",blank:"making",after:"her bed.",rule:"make → making (rimuovi -e finale, aggiungi -ing)",example:"She likes making pizza."},
+  {topic:"like + -ing",instruction:"Write the correct -ing form of the verb.",before:"Do you like",blank:"running",after:"in the park?",rule:"run → running (CVC: raddoppia consonante finale!)",example:"Do you like running?"},
+  {topic:"like + -ing",instruction:"Write the correct -ing form of the verb.",before:"Josh loves",blank:"watching",after:"sci-fi films.",rule:"watch → watching (aggiungi solo -ing)",example:"He loves watching TV."},
+  {topic:"like + -ing",instruction:"Write the correct -ing form of the verb.",before:"We don't mind",blank:"helping",after:"at home.",rule:"help → helping (aggiungi solo -ing)",example:"I don't mind walking to school."},
+  {topic:"Mixed",instruction:"Complete with has to, have to, or must. (external rule from teacher)",before:"My teacher says we",blank:"have to",after:"finish the project by Friday.",rule:"HAVE TO = obbligo esterno (regola del professore).",example:"We have to hand in our homework."}
 ];
 
-let quizQueue = [], quizIndex = 0, quizScore = 0, quizWrong = [];
-let quizAnswered = false;
+var v2Queue=[], v2Idx=0, v2Score=0, v2Wrong=[], v2Answered=false;
 
-function normalize(s) {
-  return s.toLowerCase().trim()
-    .replace(/['']/g, "'")
-    .replace(/\s+/g, ' ')
-    .replace(/^(the|a|an) /, '');
+function startV2Quiz() {
+  var byTopic={};
+  V2_POOL.forEach(function(e){ if(!byTopic[e.topic]) byTopic[e.topic]=[]; byTopic[e.topic].push(e); });
+  var selected=[];
+  ['have to — Affirmative','have to — Negative','have to — Interrogative','have to — Short answers','must','like + -ing'].forEach(function(t){
+    var pool=(byTopic[t]||[]).slice().sort(function(){return Math.random()-0.5;});
+    selected.push.apply(selected, pool.slice(0,2));
+  });
+  var remaining=V2_POOL.filter(function(e){return selected.indexOf(e)===-1;}).sort(function(){return Math.random()-0.5;});
+  selected.push.apply(selected, remaining.slice(0,Math.max(0,15-selected.length)));
+  v2Queue=selected.sort(function(){return Math.random()-0.5;});
+  v2Idx=0; v2Score=0; v2Wrong=[];
+  showV2Q();
 }
 
-function isCorrect(input, correct) {
-  const i = normalize(input);
-  const c = normalize(correct);
-  if (i === c) return true;
-  // accept without articles
-  const alts = correct.split('/').map(x => normalize(x.trim()));
-  return alts.some(a => i === a);
+function showV2Q() {
+  v2Answered=false;
+  var q=v2Queue[v2Idx], total=v2Queue.length;
+  document.getElementById('v2-counter').textContent=(v2Idx+1)+' / '+total;
+  var pct=(v2Idx/total*100)+'%';
+  var isLong=q.before.length>30;
+  var inputHTML=isLong
+    ? '<div style="margin-top:8px;"><input class="v2-input" id="v2-input" type="text" placeholder="Write the full sentence" autocomplete="off" autocorrect="off" spellcheck="false" onkeydown="v2Key(event)" style="width:100%;"/></div>'
+    : '<span><input class="v2-input" id="v2-input" type="text" placeholder="..." autocomplete="off" autocorrect="off" spellcheck="false" onkeydown="v2Key(event)" style="min-width:160px;max-width:240px;"/></span>';
+  document.getElementById('v2-body').innerHTML=
+    '<div class="quiz-progress" style="width:100%;max-width:480px;"><div class="quiz-progress-bar" style="width:'+pct+';background:linear-gradient(90deg,#7c3aed,#4c1d95);"></div></div>'+
+    '<div class="quiz-card" style="max-width:480px;text-align:left;border-color:#ddd6fe;">'+
+      '<div style="font-size:10px;font-weight:900;color:#a78bfa;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">'+q.topic+'</div>'+
+      '<div style="font-size:14px;font-weight:700;color:#4c1d95;margin-bottom:14px;">'+q.instruction+'</div>'+
+      '<div class="fill-row" style="font-size:15px;font-weight:700;color:#1f2937;flex-wrap:wrap;gap:6px;">'+
+        (q.before?'<span>'+q.before+'</span>':'')+inputHTML+(q.after?'<span>'+q.after+'</span>':'')+
+      '</div>'+
+      '<div id="v2-feedback" style="font-size:14px;font-weight:800;min-height:20px;margin-top:10px;"></div>'+
+      '<div id="v2-rule" style="display:none;background:#f5f3ff;border-left:3px solid #7c3aed;border-radius:0 8px 8px 0;padding:10px 14px;margin-top:10px;font-size:13px;color:#4c1d95;line-height:1.7;"></div>'+
+    '</div>'+
+    '<button class="quiz-btn" id="v2-btn" style="background:linear-gradient(135deg,#7c3aed,#4c1d95);box-shadow:0 4px 14px rgba(124,58,237,0.35);max-width:480px;" onclick="checkV2()">Check ✓</button>';
+  setTimeout(function(){ var i=document.getElementById('v2-input'); if(i) i.focus(); },100);
 }
 
-function startQuiz() {
-  quizQueue = [...WORDS].sort(() => Math.random() - 0.5);
-  quizIndex = 0; quizScore = 0; quizWrong = [];
-  showQuestion();
-}
+function v2Key(e){ if(e.key==='Enter'){ if(!v2Answered) checkV2(); else nextV2(); } }
 
-function showQuestion() {
-  quizAnswered = false;
-  const w = quizQueue[quizIndex];
-  const total = quizQueue.length;
-  document.getElementById('quiz-counter').textContent = (quizIndex+1) + ' / ' + total;
-  const pct = (quizIndex / total * 100) + '%';
+function normV2(s){ return s.toLowerCase().trim().replace(/['.!?,]/g,'').replace(/\s+/g,' '); }
 
-  document.getElementById('quiz-body').innerHTML = `
-    <div class="quiz-progress" style="width:100%;max-width:400px;">
-      <div class="quiz-progress-bar" style="width:${pct}"></div>
-    </div>
-    <div class="quiz-card">
-      <div class="quiz-label">Come si dice in inglese?</div>
-      <div class="quiz-word">${w.it}</div>
-      <div class="quiz-hint">Scrivi la parola in inglese</div>
-      <input class="quiz-input" id="quiz-input" type="text"
-        placeholder="..." autocomplete="off" autocorrect="off" spellcheck="false"
-        onkeydown="quizKey(event)"/>
-      <div class="quiz-feedback" id="quiz-feedback"></div>
-    </div>
-    <button class="quiz-btn" id="quiz-action-btn" onclick="checkAnswer()">Controlla ✓</button>
-  `;
-  setTimeout(() => {
-    const inp = document.getElementById('quiz-input');
-    if (inp) inp.focus();
-  }, 100);
-}
-
-function quizKey(e) {
-  if (e.key === 'Enter') {
-    if (!quizAnswered) checkAnswer();
-    else nextQuestion();
-  }
-}
-
-function checkAnswer() {
-  if (quizAnswered) return;
-  quizAnswered = true;
-  const w = quizQueue[quizIndex];
-  const input = document.getElementById('quiz-input');
-  const feedback = document.getElementById('quiz-feedback');
-  const btn = document.getElementById('quiz-action-btn');
-  const val = input.value.trim();
-  if (!val) return;
-
-  if (isCorrect(val, w.en)) {
-    quizScore++;
-    input.classList.add('correct');
-    feedback.className = 'quiz-feedback correct';
-    feedback.textContent = '✅ Corretto! Well done!';
+function checkV2() {
+  if(v2Answered) return;
+  var inp=document.getElementById('v2-input');
+  if(!inp||!inp.value.trim()) return;
+  v2Answered=true;
+  var q=v2Queue[v2Idx];
+  var ok=normV2(inp.value)===normV2(q.blank);
+  var fb=document.getElementById('v2-feedback');
+  var ruleEl=document.getElementById('v2-rule');
+  var btn=document.getElementById('v2-btn');
+  if(ok){
+    v2Score++;
+    inp.style.cssText+='border-color:#22c55e;background:#f0fdf4;color:#15803d;';
+    fb.style.color='#15803d'; fb.textContent='✅ Correct! Well done!';
+    btn.textContent=v2Idx<v2Queue.length-1?'Next →':'Results 🏆'; btn.onclick=nextV2;
   } else {
-    input.classList.add('wrong');
-    feedback.className = 'quiz-feedback wrong';
-    feedback.innerHTML = '❌ La risposta è: <b>' + w.en + '</b>';
-    quizWrong.push(w);
+    v2Wrong.push(q);
+    fb.style.color='#dc2626'; fb.innerHTML='❌ The correct answer is: <b style="color:#5b21b6">'+q.blank+'</b>';
+    ruleEl.style.display='block';
+    ruleEl.innerHTML='<b style="color:#5b21b6">📖 Rule:</b><br>'+q.rule+'<br><br><b style="color:#5b21b6">✏️ Example:</b><br><i>'+q.example+'</i><br><br><b style="color:#5b21b6">Now type the correct answer:</b>';
+    inp.value=''; inp.style.cssText='border-color:#7c3aed;'; inp.placeholder='Type the correct answer...'; inp.disabled=false; inp.focus();
+    btn.textContent='Confirm ✓'; btn.onclick=retryV2;
   }
-  btn.textContent = quizIndex < quizQueue.length - 1 ? 'Avanti →' : 'Risultati 🏆';
-  btn.onclick = nextQuestion;
 }
 
-function nextQuestion() {
-  quizIndex++;
-  if (quizIndex >= quizQueue.length) {
-    showResults();
+function retryV2(){
+  var inp=document.getElementById('v2-input');
+  var q=v2Queue[v2Idx];
+  if(!inp||!inp.value.trim()){inp.focus();return;}
+  if(normV2(inp.value)===normV2(q.blank)){
+    inp.style.cssText+='border-color:#22c55e;background:#f0fdf4;color:#15803d;'; inp.disabled=true;
+    var btn=document.getElementById('v2-btn');
+    btn.textContent=v2Idx<v2Queue.length-1?'Next →':'Results 🏆'; btn.onclick=nextV2;
   } else {
-    showQuestion();
+    inp.style.borderColor='#f87171'; inp.style.background='#fef2f2'; inp.value=''; inp.placeholder='Not quite, try again!'; inp.focus();
   }
 }
 
-function showResults() {
-  const total = quizQueue.length;
-  const pct = Math.round(quizScore / total * 100);
-  const emoji = pct === 100 ? '🏆' : pct >= 70 ? '🌟' : pct >= 40 ? '💪' : '📚';
-  const msg = pct === 100 ? 'Perfetto!' : pct >= 70 ? 'Ottimo lavoro!' : pct >= 40 ? 'Continua così!' : 'Riprova, ci riuscirai!';
+function nextV2(){ v2Idx++; if(v2Idx>=v2Queue.length) showV2Results(); else showV2Q(); }
 
-  let wrongHTML = '';
-  if (quizWrong.length > 0) {
-    wrongHTML = '<div class="quiz-wrong-list"><b style="font-size:13px;color:#6b7280;">Da ripassare:</b>';
-    quizWrong.forEach(w => {
-      wrongHTML += `<div class="quiz-wrong-item">${w.it} → <b>${w.en}</b></div>`;
+function showV2Results(){
+  var total=v2Queue.length, pct=Math.round(v2Score/total*100);
+  var emoji=pct===100?'🏆':pct>=80?'🌟':pct>=60?'💪':'📚';
+  var msg=pct===100?'Perfect! Amazing! 🎉':pct>=80?'Great job!':pct>=60?'Good effort!':'Keep practising!';
+  var wHTML='';
+  if(v2Wrong.length>0){
+    wHTML='<div style="width:100%;max-width:480px;margin-top:8px;">';
+    wHTML+='<div style="font-size:13px;font-weight:800;color:#5b21b6;margin-bottom:8px;">📖 Review these:</div>';
+    v2Wrong.forEach(function(q){
+      wHTML+='<div style="padding:8px 0;border-bottom:1px solid #ede9fe;"><div style="font-size:11px;color:#a78bfa;font-weight:800;">'+q.topic+'</div><div style="font-weight:700;">'+q.before+' <b style="color:#5b21b6;">'+q.blank+'</b> '+q.after+'</div><div style="font-size:12px;color:#6b7280;font-style:italic;">'+q.rule+'</div></div>';
     });
-    wrongHTML += '</div>';
+    wHTML+='</div>';
   }
-
-  document.getElementById('quiz-counter').textContent = '';
-  document.getElementById('quiz-body').innerHTML = `
-    <div class="quiz-score-card">
-      <div style="font-size:48px;margin-bottom:4px;">${emoji}</div>
-      <div class="quiz-score-big">${quizScore}/${total}</div>
-      <div class="quiz-score-label">${msg} (${pct}%)</div>
-      ${wrongHTML}
-    </div>
-    <button class="quiz-btn" onclick="startQuiz()">🔄 Ricomincia</button>
-    <button class="quiz-btn pink" onclick="showScreen('screen-topics')" style="margin-top:8px;">← Topics</button>
-  `;
+  document.getElementById('v2-counter').textContent='';
+  document.getElementById('v2-body').innerHTML=
+    '<div class="quiz-score-card" style="max-width:480px;border-color:#ddd6fe;"><div style="font-size:52px;">'+emoji+'</div><div class="quiz-score-big" style="color:#5b21b6;">'+v2Score+'/'+total+'</div><div class="quiz-score-label">'+msg+' ('+pct+'%)</div></div>'+
+    wHTML+
+    '<button class="quiz-btn" style="background:linear-gradient(135deg,#7c3aed,#4c1d95);max-width:480px;" onclick="startV2Quiz()">🔄 New session</button>'+
+    '<button class="quiz-btn" style="background:linear-gradient(135deg,#6b7280,#4b5563);max-width:480px;margin-top:8px;" onclick="showTopics()">← Topics</button>';
   savePracticeDay();
 }
-
-// Auto-start quiz when screen is shown
-const _origShowScreen = showScreen;
-window.showScreen = function(id) {
-  _origShowScreen(id);
-  if (id === 'screen-quiz') startQuiz();
-};
-
-// ── TRANSLATION ──
-async function translateMsg(text, container) {
-  // remove existing translation
-  const existing = container.querySelector(".translation-bubble");
-  if (existing) { existing.remove(); return; }
-  const btn = container.querySelector(".translate-btn");
-  if (btn) btn.textContent = "⏳";
-  try {
-    const res = await fetch("/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 200,
-        messages: [{
-          role: "user",
-          content: "Translate this English text to Italian. Reply with ONLY the Italian translation, nothing else: " + text
-        }]
-      })
-    });
-    const data = await res.json();
-    const translation = data.content?.[0]?.text || "Traduzione non disponibile";
-    const bubble = document.createElement("div");
-    bubble.className = "translation-bubble";
-    bubble.textContent = "🇮🇹 " + translation;
-    container.appendChild(bubble);
-    if (btn) btn.textContent = "🇮🇹";
-  } catch(e) {
-    if (btn) btn.textContent = "🇮🇹";
-  }
-}
 </script>
-<!-- ══ QUIZ ══ -->
-<div id="screen-quiz" class="screen">
-  <div class="quiz-shell">
-    <div class="quiz-topbar">
-      <button class="back-btn" onclick="showScreen('screen-topics')">← Topics</button>
-      <span style="font-weight:800;color:#059669;font-size:15px;">🎯 Vocabulary Quiz</span>
-      <span id="quiz-counter" style="font-weight:800;color:#6ee7b7;font-size:13px;"></span>
+<!-- VERIFICA 2 -->
+<div id="screen-verifica2" class="screen">
+  <div class="quiz-shell" style="border-color:rgba(124,58,237,0.4);">
+    <div class="quiz-topbar" style="border-bottom-color:#ddd6fe;background:rgba(245,243,255,0.95);">
+      <button class="back-btn" style="background:#ede9fe;color:#5b21b6;" onclick="showTopics()">← Topics</button>
+      <span style="font-weight:800;color:#5b21b6;font-size:14px;">📋 Verifica 2</span>
+      <span id="v2-counter" style="font-weight:800;color:#a78bfa;font-size:13px;"></span>
     </div>
-    <div class="quiz-body" id="quiz-body">
-      <!-- populated by JS -->
-    </div>
+    <div class="quiz-body" id="v2-body"></div>
   </div>
 </div>
-
 
 </body>
 </html>
