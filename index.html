@@ -143,6 +143,8 @@ body {
 <body>
 
 <!-- WELCOME -->
+<button style="position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#34d399,#059669);color:white;border:none;border-radius:20px;padding:12px 28px;font-size:16px;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;box-shadow:0 6px 20px rgba(5,150,105,0.4);z-index:999;" id="sound-banner" onclick="unlockAudio()">🔊 Tap to enable sound!</button>
+
 <div id="screen-welcome" class="screen active">
   <div class="welcome-card">
     <div class="lily-wrap" style="margin:0 auto;">
@@ -194,7 +196,8 @@ body {
       <div class="msg-col" id="msg-col"></div>
     </div>
     <div class="chat-inputbar">
-      <input id="chat-input" type="text" placeholder="Write in English… ✍️" onkeydown="handleKey(event)"/>
+      <button id="mic-btn" onclick="toggleMic()" style="width:46px;height:46px;border-radius:13px;border:2px solid #bbf7d0;font-size:20px;cursor:pointer;flex-shrink:0;background:#f0fdf4;display:flex;align-items:center;justify-content:center;transition:all .2s;">🎤</button>
+      <input id="chat-input" type="text" placeholder="Write or speak in English… ✍️🎤" onkeydown="handleKey(event)"/>
       <button class="send-btn" id="send-btn" onclick="sendMsg()" disabled>➤</button>
     </div>
   </div>
@@ -320,6 +323,7 @@ function addBubble(who, text) {
   wrap.appendChild(b);
   col.appendChild(wrap);
   col.scrollTop = col.scrollHeight;
+  if(who==='lily') speak(text);
 }
 
 let typingEl = null;
@@ -506,6 +510,70 @@ function showV2Results(){
     '<button class="quiz-btn" style="background:linear-gradient(135deg,#7c3aed,#4c1d95);max-width:480px;" onclick="startV2Quiz()">🔄 New session</button>'+
     '<button class="quiz-btn" style="background:linear-gradient(135deg,#6b7280,#4b5563);max-width:480px;margin-top:8px;" onclick="showTopics()">← Topics</button>';
   savePracticeDay();
+}
+
+// ── AUDIO UNLOCK ──
+var audioUnlocked = false;
+function unlockAudio() {
+  audioUnlocked = true;
+  var banner = document.getElementById('sound-banner');
+  if(banner) banner.style.display = 'none';
+  var u = new SpeechSynthesisUtterance('');
+  window.speechSynthesis.speak(u);
+}
+
+// ── SPEECH SYNTHESIS ──
+function speak(text) {
+  if(!audioUnlocked || !window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  var clean = text.replace(/[^\x00-\xFF]/g,' ').replace(/\s+/g,' ').trim();
+  var utt = new SpeechSynthesisUtterance(clean);
+  utt.lang = 'en-GB'; utt.rate = 0.88; utt.pitch = 1.15;
+  var voices = window.speechSynthesis.getVoices();
+  var voice = voices.find(function(v){ return v.lang==='en-GB' && /female|hazel|susan|karen/i.test(v.name); })
+    || voices.find(function(v){ return v.lang==='en-GB'; })
+    || voices.find(function(v){ return v.lang.startsWith('en'); });
+  if(voice) utt.voice = voice;
+  window.speechSynthesis.speak(utt);
+}
+window.speechSynthesis.onvoiceschanged = function(){ window.speechSynthesis.getVoices(); };
+
+// ── SPEECH RECOGNITION ──
+var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+var recognition = null, isListening = false;
+if(SR) {
+  recognition = new SR();
+  recognition.lang = 'en-US';
+  recognition.continuous = false;
+  recognition.interimResults = false;
+  recognition.onresult = function(e) {
+    document.getElementById('chat-input').value = e.results[0][0].transcript;
+    document.getElementById('send-btn').disabled = false;
+    stopListening();
+    setTimeout(sendMsg, 500);
+  };
+  recognition.onerror = function(){ stopListening(); };
+  recognition.onend = function(){ stopListening(); };
+}
+function toggleMic() {
+  if(!recognition){ alert('Voice not supported. Try Chrome!'); return; }
+  if(isListening) stopListening(); else startListening();
+}
+function startListening() {
+  isListening = true;
+  var btn = document.getElementById('mic-btn');
+  if(btn){ btn.style.background='#ec4899'; btn.style.borderColor='#ec4899'; btn.style.color='white'; btn.textContent='⏹'; }
+  var inp = document.getElementById('chat-input');
+  if(inp) inp.placeholder = 'Listening… 👂';
+  recognition.start();
+}
+function stopListening() {
+  isListening = false;
+  var btn = document.getElementById('mic-btn');
+  if(btn){ btn.style.background='#f0fdf4'; btn.style.borderColor='#bbf7d0'; btn.style.color=''; btn.textContent='🎤'; }
+  var inp = document.getElementById('chat-input');
+  if(inp) inp.placeholder = 'Write or speak in English… ✍️🎤';
+  try{ recognition.stop(); }catch(e){}
 }
 </script>
 <!-- VERIFICA 2 -->
